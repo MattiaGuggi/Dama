@@ -37,12 +37,14 @@ public class Server {
             PrintWriter out1 = new PrintWriter(newSocket.getOutputStream(),true);
 
             Game game = new Game();
+            Pedina[][] board = game.getBoard();
             
             out.println("createGame");
             out1.println("createGame");
             //Adesso ho i due giocatori
             //Posso iniziare la partita
             Boolean finePartita = false;
+
             while(!finePartita){
                 
             }

@@ -1,9 +1,8 @@
 package Client;
 
 import java.net.*;
-import java.rmi.server.ExportException;
-import java.util.Scanner;
 import java.io.*;
+import Server.Game;
 
 public class ClientHandler extends Thread{
     private Boolean partitaFinita = false;
@@ -32,7 +31,7 @@ public class ClientHandler extends Thread{
                         System.out.println("La partita sta per iniziare!");
                         Thread.sleep(2000);
                         
-                        campo = new Campo(decode[1]);
+                        campo = new Campo(new Game().getBoard());
                     }
                     System.out.println(result);
                 }
