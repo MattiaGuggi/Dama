@@ -8,30 +8,29 @@ public class Campo {
     private final int MAX = 8;
 
     public Campo(Pedina[][] board) {
-        new JFrame1(board); // Disegna il campo subito
+        new JFrame1(board, MAX); // Disegna il campo subito
     }
 }
 
 class JFrame1 {
-    private final int MAX = 8;
-    private JButton[][] buttons = new JButton[MAX][MAX];
-
-    public JFrame1(Pedina[][] board) {
+    public JFrame1(Pedina[][] board, int dim) {
+        JButton[][] buttons = new JButton[dim][dim];
         JFrame frame = new JFrame("Dama");
 
         frame.setSize(800, 800);
-        frame.setLayout(new GridLayout(MAX, MAX));
+        frame.setLayout(new GridLayout(dim, dim));
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
-        for (int i = 0; i < MAX; i++) {
-            for (int j = 0; j < MAX; j++) {
+        for (int i = 0; i < dim; i++) {
+            for (int j = 0; j < dim; j++) {
                 buttons[i][j] = new JButton();
                 buttons[i][j].setLayout(new BorderLayout());
                 
                 // Per alternare i colori di sfondo
                 if ((i + j) % 2 == 0) {
                     buttons[i][j].setBackground(Color.WHITE);
-                } else {
+                }
+                else {
                     buttons[i][j].setBackground(Color.BLACK);
                 }
 
