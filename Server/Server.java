@@ -43,6 +43,7 @@ public class Server {
             StringBuilder boardData = new StringBuilder();
             for (int i=0 ; i<board.length ; i++) {
                 for (int j=0 ; j<board[i].length ; j++) {
+                    // Se su quella cella c'é una pedina
                     if (board[i][j] != null) {
                         boardData.append(board[i][j].toString()).append("#");
                     }
@@ -54,7 +55,7 @@ public class Server {
                 boardData.setLength(boardData.length() - 1);
             }
             
-            // Da concatenare con # e la board da passare in qualche modo
+            // Passo al client cosa fare e la matrice di Pedine in formato comando#matrice
             out.println("createGame#" + boardData.toString());
             out1.println("createGame#" + boardData.toString());
             //Adesso ho i due giocatori

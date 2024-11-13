@@ -38,6 +38,7 @@ public class ClientHandler extends Thread{
                         Pedina[][] board = new Pedina[MAX][MAX];
 
                         for (String pedinaStr : pedineData) {
+                            // Recupero valori passati dal server (posizione di ogni pedina)
                             String[] split = pedinaStr.split(",");
                             String colore = split[0];
                             int x = Integer.parseInt(split[1]);
