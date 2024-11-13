@@ -31,7 +31,9 @@ public class ClientHandler extends Thread{
                         System.out.println("La partita sta per iniziare!");
                         Thread.sleep(2000);
                         
+                        // Crea un nuovo oggetto Game (non so come passarglielo dal server ma in teoria non importa pk inizializzato é uguale)
                         campo = new Campo(new Game().getBoard());
+                        campo.drawBoard();
                     }
                     System.out.println(result);
                 }
