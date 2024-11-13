@@ -39,17 +39,18 @@ public class Server {
             Game game = new Game();
             Pedina[][] board = game.getBoard();
             
+            // Da concatenare con # e la board da passare in qualche modo
             out.println("createGame");
             out1.println("createGame");
             //Adesso ho i due giocatori
             //Posso iniziare la partita
-            Boolean finePartita = false;
+            Boolean endGame = false;
 
-            while(!finePartita){
-                
+            while(!endGame){
+                endGame = game.checkWin();
             }
 
-            System.out.println("Inizio partita!!");
+            System.out.println("Fine partita!!");
         }
         catch(Exception e){
             e.printStackTrace();

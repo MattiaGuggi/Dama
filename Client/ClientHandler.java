@@ -31,7 +31,7 @@ public class ClientHandler extends Thread{
                         System.out.println("La partita sta per iniziare!");
                         Thread.sleep(2000);
                         
-                        // Crea un nuovo oggetto Game (non so come passarglielo dal server ma in teoria non importa pk inizializzato é uguale)
+                        // Crea un nuovo oggetto Game (dovrei prenderlo dalla variabile decode quando decideremo come fare a lato server)
                         campo = new Campo(new Game().getBoard());
                         campo.drawBoard();
                     }

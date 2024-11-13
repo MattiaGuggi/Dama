@@ -17,4 +17,8 @@ public class Pedina {
     public String getColor() {
         return this.color;
     }
+
+    public Posizione getPosizione() {
+        return this.posizione;
+    }
 }

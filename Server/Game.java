@@ -42,4 +42,27 @@ public class Game {
     public Pedina[][] getBoard(){
         return this.board;
     }
+
+    public Boolean checkWin() {
+        // Devono esserci solo pedine di un colore
+        String color = "";
+        for (int i=0 ; i<MAX ; i++) {
+            for (int j=0 ; j<MAX ; j++) {
+                // Se su quella cella c'é una pedina
+                if (board[i][j] != null) {
+                    // Se il colore non e' gia' stato impostato
+                    if (color.equals("")) {
+                        color = board[i][j].getColor(); // Ora controllo che siano tutte di questo colore
+                    }
+                    // N esima pedina incontrata, é diversa dalla prima incontrata?
+                    else if (!color.equals(board[i][j].getColor())) {
+                        return false; // L'altro giocatore puó ancora muovere
+                    }
+                }
+            }
+        }
+
+        // Non ho incontrato problemi (nessuna pedina di colore diverso)
+        return true;
+    }
 }
