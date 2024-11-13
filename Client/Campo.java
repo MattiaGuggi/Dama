@@ -8,7 +8,7 @@ public class Campo {
     private final int MAX = 8;
 
     public Campo(Pedina[][] board) {
-        new JFrame1(board); // Draw the game board immediately
+        new JFrame1(board); // Disegna il campo subito
     }
 }
 
@@ -39,7 +39,7 @@ class JFrame1 {
                 if (board[i][j] != null) {
                     PedinaGrafica piece = new PedinaGrafica();
 
-                    piece.setColor(board[i][j].getColor().equals("black") ? Color.DARK_GRAY : Color.LIGHT_GRAY);
+                    piece.setColor(board[i][j].getColor().equals("black") ? Color.DARK_GRAY : Color.LIGHT_GRAY); // Cambia colore pedina in base al giocatore
                     buttons[i][j].add(piece, BorderLayout.CENTER);
                 }
 
