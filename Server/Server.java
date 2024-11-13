@@ -38,10 +38,25 @@ public class Server {
 
             Game game = new Game();
             Pedina[][] board = game.getBoard();
+
+            // Conversione array in stringa di formato colore#x#y
+            StringBuilder boardData = new StringBuilder();
+            for (int i=0 ; i<board.length ; i++) {
+                for (int j=0 ; j<board[i].length ; j++) {
+                    if (board[i][j] != null) {
+                        boardData.append(board[i][j].toString()).append("#");
+                    }
+                }
+            }
+
+            // Rimuovi l'ultimo separatore
+            if (boardData.length() > 0) {
+                boardData.setLength(boardData.length() - 1);
+            }
             
             // Da concatenare con # e la board da passare in qualche modo
-            out.println("createGame");
-            out1.println("createGame");
+            out.println("createGame#" + boardData.toString());
+            out1.println("createGame#" + boardData.toString());
             //Adesso ho i due giocatori
             //Posso iniziare la partita
             Boolean endGame = false;

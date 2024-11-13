@@ -4,7 +4,7 @@ public class Posizione {
     private int x;
     private int y;
     
-    public Posizione(int x,int y){
+    public Posizione(int x, int y){
         this.x = x;
         this.y = y;
     }
@@ -25,6 +25,6 @@ public class Posizione {
 
     @Override
     public String toString(){
-        return "{x:"+this.x+";y:"+this.y+"}";
+        return x + "," + y;
     }
 }
