@@ -6,23 +6,22 @@ import Server.Pedina;
 
 public class Campo {
     private final int MAX = 8;
+    private Pedina[][] board;
 
     public Campo(Pedina[][] board) {
-        new JFrame1(board, MAX); // Disegna il campo subito
+        this.board = board;
     }
-}
 
-class JFrame1 {
-    public JFrame1(Pedina[][] board, int dim) {
-        JButton[][] buttons = new JButton[dim][dim];
+    public void drawBoard() {
+        JButton[][] buttons = new JButton[MAX][MAX];
         JFrame frame = new JFrame("Dama");
 
         frame.setSize(800, 800);
-        frame.setLayout(new GridLayout(dim, dim));
+        frame.setLayout(new GridLayout(MAX, MAX));
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
-        for (int i = 0; i < dim; i++) {
-            for (int j = 0; j < dim; j++) {
+        for (int i=0 ; i<MAX ; i++) {
+            for (int j=0 ; j<MAX ; j++) {
                 buttons[i][j] = new JButton();
                 buttons[i][j].setLayout(new BorderLayout());
                 
