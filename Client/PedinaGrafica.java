@@ -62,9 +62,9 @@ class PedinaGrafica extends JComponent {
     // Per ora mostra solo la posizione della pedina
     // Deve mostrare sul campo grafico dove puó muovere
     public void showPossibleMoves() {
-        // Get possible moves and display them
         ArrayList<Posizione> possibleMoves = getPossibleMoves();
         System.out.println("Posizione della pedina cliccata: " + this.posizione);
+        
         for (Posizione pos : possibleMoves) {
             System.out.println("Posizione possibile: " + pos);
         }
