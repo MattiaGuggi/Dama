@@ -22,6 +22,10 @@ public class Pedina {
         return this.posizione;
     }
 
+    public void setPosition(Posizione posizione) {
+        this.posizione = posizione;
+    }
+
     @Override
     public String toString() {
         return color + "," + posizione;
