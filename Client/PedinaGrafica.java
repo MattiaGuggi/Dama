@@ -26,7 +26,7 @@ class PedinaGrafica extends JComponent {
             public void mouseClicked(MouseEvent e) {
                 if (clickListener != null) {
                     clickListener.onPedinaClicked(PedinaGrafica.this); // Notifica il Campo
-                    setOpacity(0.5f); // Set opacity to 50% when clicked
+                    setOpacity(0.5f);
                 }
                 showPossibleMoves();
             }
