@@ -13,7 +13,7 @@ class PedinaGrafica extends JComponent {
     private Color color;
     private Posizione posizione;
     private PedinaClickListener clickListener; // Listener per notificare il Campo
-    private ArrayList<Posizione> allPossibleMoves = new ArrayList<>();
+    private ArrayList<PedinaGrafica> allPedineGrafiche = new ArrayList<>();
     private Pedina[][] board;
 
     public PedinaGrafica(Posizione posizione, Pedina[][] board) {
@@ -26,6 +26,13 @@ class PedinaGrafica extends JComponent {
             public void mouseClicked(MouseEvent e) {
                 if (clickListener != null) {
                     clickListener.onPedinaClicked(PedinaGrafica.this); // Notifica il Campo
+                    // Resetta l'opacità di tutte le pedine
+                    if (allPedineGrafiche != null) {
+                        for (PedinaGrafica pedina : allPedineGrafiche) {
+                            pedina.setOpacity(1.0f);
+                        }
+                    }
+                    // Imposta l'opacità della pedina cliccata
                     setOpacity(0.5f);
                 }
                 showPossibleMoves();
@@ -35,6 +42,10 @@ class PedinaGrafica extends JComponent {
 
     public void setClickListener(PedinaClickListener clickListener) {
         this.clickListener = clickListener;
+    }
+
+    public void setArrayAllPedineGrafiche(ArrayList<PedinaGrafica> allPedineGrafiche) {
+        this.allPedineGrafiche = allPedineGrafiche;
     }
 
     public void setOpacity(float opacity) {
@@ -64,7 +75,7 @@ class PedinaGrafica extends JComponent {
     public void showPossibleMoves() {
         ArrayList<Posizione> possibleMoves = getPossibleMoves();
         System.out.println("Posizione della pedina cliccata: " + this.posizione);
-        
+
         for (Posizione pos : possibleMoves) {
             System.out.println("Posizione possibile: " + pos);
         }
@@ -74,19 +85,19 @@ class PedinaGrafica extends JComponent {
     public ArrayList<Posizione> getPossibleMoves() {
         int x = posizione.getX();
         int y = posizione.getY();
+        ArrayList<Posizione> allPossibleMoves = new ArrayList<>();
 
-        // DA RIGUARDARE COMPLETAMENTE!!!
         // Se é libera puoi muovere
         // Puó andare solo in avanti quindi controllo solo sulle righe successive
-        // Bisogna peró ribaltare la scacchiera grafica e logica per entrambi i giocatori sennó va modificata la logica
-        if (x < MAX-1 && y < MAX-1 && this.board[x+1][y+1] != null) {
-            this.allPossibleMoves.add(new Posizione(x+1, y+1));
+        // RITORNA SOLO POSIZIONI A SX
+        if (x < MAX-1 && y < MAX-1 && this.board[x+1][y+1] == null) {
+            allPossibleMoves.add(new Posizione(x+1, y+1));
         }
-        else if (x > 0 && y<MAX-1 && this.board[x-1][y+1] != null) {
-            this.allPossibleMoves.add(new Posizione(x-1, y+1));
+        else if (x < MAX-1 && y > 0 && this.board[x+1][y-1] == null) {
+            allPossibleMoves.add(new Posizione(x+1, y-1));
         }
 
-        return this.allPossibleMoves;
+        return allPossibleMoves;
     }
 
     @Override

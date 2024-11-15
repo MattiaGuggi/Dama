@@ -13,6 +13,7 @@ public class Campo implements PedinaClickListener {
     private final int MAX = 8;
     private Pedina[][] board;
     private JPanel[][] cells = new JPanel[MAX][MAX];
+    private ArrayList<PedinaGrafica> allPedineGrafiche = new ArrayList<>();
     private PedinaGrafica pedinaCliccata = null; // Tiene traccia della pedina cliccata prima che deve essere spostata
 
     public Campo(Pedina[][] board) {
@@ -32,13 +33,16 @@ public class Campo implements PedinaClickListener {
                 // Alterna i colori della scacchiera
                 if ((i + j) % 2 == 0) {
                     cells[i][j].setBackground(Color.WHITE);
-                } else {
+                }
+                else {
                     cells[i][j].setBackground(Color.BLACK);
                 }
 
                 // If there's a piece
                 if (board[i][j] != null) {
-                    PedinaGrafica piece = new PedinaGrafica(new Posizione(i, j), board);
+                    PedinaGrafica piece = new PedinaGrafica(new Posizione(i, j), this.board);
+                    allPedineGrafiche.add(piece);
+                    piece.setArrayAllPedineGrafiche(allPedineGrafiche);
                     piece.setColor(board[i][j].getColor().equals("black") ? Color.DARK_GRAY : Color.LIGHT_GRAY);
                     piece.setPreferredSize(new Dimension(60, 60));
                     piece.setClickListener(this); // Setta la classe come listener per i click
@@ -59,6 +63,7 @@ public class Campo implements PedinaClickListener {
                             // Trova se la cella cliccata é una valida (dovrebbe essere colorata)
                             if (allPossibleMoves.size() > 0) {
                                 for (Posizione pos : allPossibleMoves) {
+                                    // Controllo che la cella cliccata abbia coordinate di una delle celle valide da muoevere
                                     if(pos.getX() == row && pos.getY() == col) {
                                         validPosition = pos;
                                     }
@@ -105,8 +110,14 @@ public class Campo implements PedinaClickListener {
         cells[row][col].revalidate();
         cells[row][col].repaint();
 
+        // Rimuovo pedina con posizione vecchia
+        allPedineGrafiche.remove(piece);
+
         // Aggiorna posizione della pedina
         piece.setPosition(new Posizione(row, col));
+
+        // Rimette pedina aggiornata in ArrayList
+        allPedineGrafiche.add(piece);
 
         // Aggiorna logicamente scacchiera (lato server)
         board[oldRow][oldCol] = null;
