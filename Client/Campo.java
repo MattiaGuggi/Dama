@@ -37,12 +37,15 @@ public class Campo {
                 else {
                     cells[i][j].setBackground(Color.BLACK);
                 }
-
+                
+                // Bisogna usare variabili final nell' event listener
+                final Pedina[][] finalBoard = this.board;
                 // If there's a piece
                 if (board[i][j] != null) {
-                    PedinaGrafica piece = new PedinaGrafica(new Posizione(i, j), this.board);
+                    PedinaGrafica piece = new PedinaGrafica(new Posizione(i, j));
 
                     // Listener per click sulla pedina
+                    // Potremmo aggiungere qui la logica di controllo del colore della propria pedina per evitare si selezionino pedine sbagliate
                     piece.addMouseListener(new MouseAdapter() {
                         @Override
                         public void mouseClicked(MouseEvent e) {
@@ -56,7 +59,7 @@ public class Campo {
                             // Imposta l'opacità della pedina cliccata
                             piece.setOpacity(0.5f);
                             
-                            piece.showPossibleMoves();
+                            piece.showPossibleMoves(finalBoard);
                         }
                     });
                     allPedineGrafiche.add(piece);
@@ -69,6 +72,7 @@ public class Campo {
                 // Bisogna usare variabili final nell' event listener
                 final int row = i;
                 final int col = j;
+
                 // Listener per click sulla cella
                 cells[i][j].addMouseListener(new MouseAdapter() {
                     @Override
@@ -78,12 +82,12 @@ public class Campo {
                             // Se ho selezionato una pedina
                             if (pedinaCliccata != null) {
                                 Posizione validPosition = null;
-                                ArrayList<Posizione> allPossibleMoves = pedinaCliccata.getPossibleMoves(); // Per ora logica non ancora implementata -> ritorna un ArrayList vuoto
+                                ArrayList<Posizione> allPossibleMoves = pedinaCliccata.getPossibleMoves(finalBoard); // Cerchiamo mosse possibili
 
-                                // Trova se la cella cliccata é una valida (dovrebbe essere colorata)
+                                // Trova se la cella cliccata é una valida (dovrebbe essere colorata diversamente)
                                 if (allPossibleMoves.size() > 0) {
                                     for (Posizione pos : allPossibleMoves) {
-                                        // Controllo che la cella cliccata abbia coordinate di una delle celle valide da muoevere
+                                        // Controllo che la cella cliccata abbia coordinate di una delle celle valide da muovere
                                         if(pos.getX() == row && pos.getY() == col) {
                                             validPosition = pos;
                                         }
@@ -96,6 +100,8 @@ public class Campo {
                                     pedinaCliccata.setOpacity(1.0f);; // Reset to original color and opacity
                                     pedinaCliccata = null; // Pedina spostata, nessuna pedina selezionata di default
                                 }
+
+                                System.out.println("Hai cliccato sulla cella: " + row + "," + col);
                             }
                         }
                     }

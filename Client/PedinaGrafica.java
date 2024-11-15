@@ -10,11 +10,9 @@ class PedinaGrafica extends JComponent {
     private int MAX = 8;
     private Color color;
     private Posizione posizione;
-    private Pedina[][] board;
 
-    public PedinaGrafica(Posizione posizione, Pedina[][] board) {
+    public PedinaGrafica(Posizione posizione) {
         this.posizione = posizione;
-        this.board = board;
     }
 
     public void setOpacity(float opacity) {
@@ -39,11 +37,9 @@ class PedinaGrafica extends JComponent {
         return this.posizione;
     }
     
-    // Per ora mostra solo la posizione della pedina
-    // Deve mostrare sul campo grafico dove puó muovere
-    public void showPossibleMoves() {
-        ArrayList<Posizione> possibleMoves = getPossibleMoves();
-        System.out.println("Posizione della pedina cliccata: " + this.posizione);
+    // Deve mostrare sul campo grafico dove puó muovere e non sul terminale
+    public void showPossibleMoves(Pedina[][] board) {
+        ArrayList<Posizione> possibleMoves = this.getPossibleMoves(board);
 
         for (Posizione pos : possibleMoves) {
             System.out.println("Posizione possibile: " + pos);
@@ -51,19 +47,20 @@ class PedinaGrafica extends JComponent {
     }
 
     // Devo ritornare tutte le posizioni in cui puó andare la pedina cliccata
-    public ArrayList<Posizione> getPossibleMoves() {
+    public ArrayList<Posizione> getPossibleMoves(Pedina[][] board) {
         int x = posizione.getX();
         int y = posizione.getY();
         ArrayList<Posizione> allPossibleMoves = new ArrayList<>();
 
         // Se é libera puoi muovere
         // Puó andare solo in avanti quindi controllo solo sulle righe successive
-        // RITORNA SOLO POSIZIONI A SX
-        if (x < MAX-1 && y < MAX-1 && this.board[x+1][y+1] == null) {
-            allPossibleMoves.add(new Posizione(x+1, y+1));
+        // Parte dal basso, dove le righe partono da 7 a salire (non da 0)
+        // Per provare, si puó muovere solo pedine in basso
+        if (x > 0 && y < MAX-1 && board[x-1][y+1] == null) {
+            allPossibleMoves.add(new Posizione(x-1, y+1));
         }
-        else if (x < MAX-1 && y > 0 && this.board[x+1][y-1] == null) {
-            allPossibleMoves.add(new Posizione(x+1, y-1));
+        if (x > 0 && y > 0 && board[x-1][y-1] == null) {
+            allPossibleMoves.add(new Posizione(x-1, y-1));
         }
 
         return allPossibleMoves;
