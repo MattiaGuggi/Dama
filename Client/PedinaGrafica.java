@@ -12,40 +12,11 @@ class PedinaGrafica extends JComponent {
     private int MAX = 8;
     private Color color;
     private Posizione posizione;
-    private PedinaClickListener clickListener; // Listener per notificare il Campo
-    private ArrayList<PedinaGrafica> allPedineGrafiche = new ArrayList<>();
     private Pedina[][] board;
 
     public PedinaGrafica(Posizione posizione, Pedina[][] board) {
         this.posizione = posizione;
         this.board = board;
-
-        // Listener per click sulla pedina
-        addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (clickListener != null) {
-                    clickListener.onPedinaClicked(PedinaGrafica.this); // Notifica il Campo
-                    // Resetta l'opacità di tutte le pedine
-                    if (allPedineGrafiche != null) {
-                        for (PedinaGrafica pedina : allPedineGrafiche) {
-                            pedina.setOpacity(1.0f);
-                        }
-                    }
-                    // Imposta l'opacità della pedina cliccata
-                    setOpacity(0.5f);
-                }
-                showPossibleMoves();
-            }
-        });
-    }
-
-    public void setClickListener(PedinaClickListener clickListener) {
-        this.clickListener = clickListener;
-    }
-
-    public void setArrayAllPedineGrafiche(ArrayList<PedinaGrafica> allPedineGrafiche) {
-        this.allPedineGrafiche = allPedineGrafiche;
     }
 
     public void setOpacity(float opacity) {

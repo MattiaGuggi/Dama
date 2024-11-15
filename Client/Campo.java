@@ -9,7 +9,7 @@ import javax.swing.*;
 import Server.Pedina;
 import Server.Posizione;
 
-public class Campo implements PedinaClickListener {
+public class Campo {
     private final int MAX = 8;
     private Pedina[][] board;
     private JPanel[][] cells = new JPanel[MAX][MAX];
@@ -41,11 +41,27 @@ public class Campo implements PedinaClickListener {
                 // If there's a piece
                 if (board[i][j] != null) {
                     PedinaGrafica piece = new PedinaGrafica(new Posizione(i, j), this.board);
+
+                    // Listener per click sulla pedina
+                    piece.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mouseClicked(MouseEvent e) {
+                            pedinaCliccata = piece;
+                            // Resetta l'opacità di tutte le pedine
+                            if (allPedineGrafiche != null) {
+                                for (PedinaGrafica pedina : allPedineGrafiche) {
+                                    pedina.setOpacity(1.0f);
+                                }
+                            }
+                            // Imposta l'opacità della pedina cliccata
+                            piece.setOpacity(0.5f);
+                            
+                            piece.showPossibleMoves();
+                        }
+                    });
                     allPedineGrafiche.add(piece);
-                    piece.setArrayAllPedineGrafiche(allPedineGrafiche);
                     piece.setColor(board[i][j].getColor().equals("black") ? Color.DARK_GRAY : Color.LIGHT_GRAY);
                     piece.setPreferredSize(new Dimension(60, 60));
-                    piece.setClickListener(this); // Setta la classe come listener per i click
                     cells[i][j].setLayout(new BorderLayout());
                     cells[i][j].add(piece, BorderLayout.CENTER);
                 }
@@ -53,28 +69,33 @@ public class Campo implements PedinaClickListener {
                 // Bisogna usare variabili final nell' event listener
                 final int row = i;
                 final int col = j;
+                // Listener per click sulla cella
                 cells[i][j].addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
-                        if (pedinaCliccata != null) {
-                            Posizione validPosition = null;
-                            ArrayList<Posizione> allPossibleMoves = pedinaCliccata.getPossibleMoves(); // Per ora logica non ancora implementata -> ritorna un ArrayList vuoto
+                        // Se é il suo turno
+                        if (isTurn()) {
+                            // Se ho selezionato una pedina
+                            if (pedinaCliccata != null) {
+                                Posizione validPosition = null;
+                                ArrayList<Posizione> allPossibleMoves = pedinaCliccata.getPossibleMoves(); // Per ora logica non ancora implementata -> ritorna un ArrayList vuoto
 
-                            // Trova se la cella cliccata é una valida (dovrebbe essere colorata)
-                            if (allPossibleMoves.size() > 0) {
-                                for (Posizione pos : allPossibleMoves) {
-                                    // Controllo che la cella cliccata abbia coordinate di una delle celle valide da muoevere
-                                    if(pos.getX() == row && pos.getY() == col) {
-                                        validPosition = pos;
+                                // Trova se la cella cliccata é una valida (dovrebbe essere colorata)
+                                if (allPossibleMoves.size() > 0) {
+                                    for (Posizione pos : allPossibleMoves) {
+                                        // Controllo che la cella cliccata abbia coordinate di una delle celle valide da muoevere
+                                        if(pos.getX() == row && pos.getY() == col) {
+                                            validPosition = pos;
+                                        }
                                     }
                                 }
-                            }
 
-                            // Se si ha cliccato una cella valida
-                            if (validPosition != null) {
-                                movePiece(row, col, pedinaCliccata);
-                                pedinaCliccata.setOpacity(1.0f);; // Reset to original color and opacity
-                                pedinaCliccata = null; // Pedina spostata, nessuna pedina selezionata di default
+                                // Se si ha cliccato una cella valida
+                                if (validPosition != null) {
+                                    movePiece(row, col, pedinaCliccata);
+                                    pedinaCliccata.setOpacity(1.0f);; // Reset to original color and opacity
+                                    pedinaCliccata = null; // Pedina spostata, nessuna pedina selezionata di default
+                                }
                             }
                         }
                     }
@@ -87,11 +108,6 @@ public class Campo implements PedinaClickListener {
         frame.pack();
         frame.setResizable(true);
         frame.setVisible(true);
-    }
-
-    @Override
-    public void onPedinaClicked(PedinaGrafica pedina) {
-        this.pedinaCliccata = pedina; // Setta pedina cliccata grazie all' interfaccia
     }
 
     public void movePiece(int row, int col, PedinaGrafica piece) {
@@ -122,5 +138,9 @@ public class Campo implements PedinaClickListener {
         // Aggiorna logicamente scacchiera (lato server)
         board[oldRow][oldCol] = null;
         board[row][col] = new Pedina(row, col, piece.getColor().equals(Color.DARK_GRAY) ? "black" : "white");
+    }
+
+    public Boolean isTurn() {
+        return true;
     }
 }

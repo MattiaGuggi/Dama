@@ -4,11 +4,11 @@ import java.net.*;
 import java.io.*;
 import Server.Pedina;
 
-public class ClientHandler extends Thread{
+public class ClientHandler extends Thread {
     private Boolean partitaFinita = false;
     private final int MAX = 8;
 
-
+    @Override
     public void run(){
         try{
             InetAddress serverAddress = InetAddress.getByName("localhost");
@@ -52,7 +52,6 @@ public class ClientHandler extends Thread{
                         campo = new Campo(board);
                         campo.drawBoard();
                     }
-                    // System.out.println(result);
                 }
             }
             
