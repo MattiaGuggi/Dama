@@ -4,6 +4,11 @@ public class Game {
     private final int MAX = 8;
  
     private Pedina[][] board = new Pedina[MAX][MAX];
+    
+    private int turn = 0;
+    /* 0-> Primo giocatore che si collega al server (Nero)
+     * 1-> Secondo giocatore che si collega al server (Bianco)
+    */
 
     public Game(){
         //Come prima cosa, creo il campo
@@ -43,9 +48,33 @@ public class Game {
         return this.board;
     }
 
+    //Ritorna il campo in versione stringa
+    //Reverse indica se devo invertire il campo
+    public String stringifyBoard(Boolean reverse){
+        
+        // Conversione array in stringa di formato colore#x#y
+        String boardData = "";
+        for (int i = 0; i < MAX; i++) {
+            for (int j = 0; j < MAX; j++) {
+                // Se su quella cella c'é una pedina
+                if (board[i][j] != null) {
+                    boardData += board[i][j].getString(reverse) + ";";
+                }
+            }
+        }
+
+        // Rimuovi l'ultimo separatore
+        if (boardData.length() > 0) {
+            boardData = boardData.substring(0, boardData.length()-1);
+        }
+
+        return boardData;
+    }
+
     public Boolean checkWin() {
         // Devono esserci solo pedine di un colore
         String color = "";
+        
         for (int i=0 ; i<MAX ; i++) {
             for (int j=0 ; j<MAX ; j++) {
                 // Se su quella cella c'é una pedina
@@ -64,5 +93,13 @@ public class Game {
 
         // Non ho incontrato problemi (nessuna pedina di colore diverso)
         return true;
+    }
+
+
+    public int getTurn(){
+        return this.turn;
+    }
+    public int getMax(){
+        return this.MAX;
     }
 }

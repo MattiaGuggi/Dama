@@ -1,6 +1,7 @@
 package Server;
 
 public class Posizione {
+    private final int MAX = 8;
     private int x;
     private int y;
     
@@ -24,7 +25,13 @@ public class Posizione {
     }
 
     @Override
-    public String toString(){
+    public String toString() {
+        return this.x+","+this.y;
+    }
+    //Potrebbe essere necessario reversare le coordinate
+    public String getString(Boolean reverse){
+        if(reverse)
+            return (MAX - x - 1) + "," + (MAX - y - 1);
         return x + "," + y;
     }
 }
