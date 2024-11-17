@@ -1,9 +1,7 @@
 package Server;
 
-import java.net.*;
 import java.io.*;
 import java.util.*;
-import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -14,6 +12,8 @@ public class Server {
     private static Socket newSocket = null;
     private static PrintWriter you = null;
     private static PrintWriter other = null;
+    private static Game game = null;
+    private static Pedina[][] board = null;
     public static void main(String[] args) {
         try{
             ServerSocket serverSocket = new ServerSocket(50000);
@@ -56,8 +56,8 @@ public class Server {
 
     public static void startGame(BufferedReader in,BufferedReader in1,PrintWriter out,PrintWriter out1){
         try{
-            Game game = new Game();
-            Pedina[][] board = game.getBoard();
+            game = new Game();
+            board = game.getBoard();
 
             String board1 = game.stringifyBoard(true);
             String board2 = game.stringifyBoard(false);
@@ -84,19 +84,18 @@ public class Server {
                 if(result != null){
                     String[] words = result.split("#");
                     
-
-                    if (words[0].equals("movePiece")) {
-                        
-                        if(turn == 0)
-                            manageMovePiece(game,words,out,out1,turn,board);
-                        manageMovePiece(game, words, out1, out,turn,board);
-
-                    }
-                    else if (words[0].equals("showPossibleMoves")) {
-                        if(turn == 0)
-                            manageShowPossibleMoves(game,words,out,board);
-                        else
-                            manageShowPossibleMoves(game, words, out1,board);
+                    switch(words[0]) {
+                        case "movePiece":
+                            if(turn == 0)
+                                manageMovePiece(words,out,out1,turn);
+                            manageMovePiece(words, out1, out,turn);
+                            break;
+                        case "showPossibleMoves":
+                            if(turn == 0)
+                                manageShowPossibleMoves(words,out);
+                            else
+                                manageShowPossibleMoves(words, out1);
+                            break;
                     }
                 }
                 endGame = game.checkWin();
@@ -110,11 +109,21 @@ public class Server {
         }
     }
 
-    static public void manageMovePiece(Game game,String[] messageFromClient,PrintWriter you,PrintWriter other,int turn, Pedina[][] board){
-        Posizione posizione = getPositionFromString(game, messageFromClient[1]);
+    static public void manageMovePiece(String[] messageFromClient,PrintWriter you,PrintWriter other,int turn){
+        Posizione startPosition = getPositionFromString(messageFromClient[1]);
+        Posizione endPosition = getPositionFromString(messageFromClient[2]);
 
-        int x = posizione.getX();
-        int y = posizione.getY();
+        int startX = startPosition.getX();
+        int startY = startPosition.getY();
+        int endX = endPosition.getX();
+        int endY = endPosition.getY();
+
+        board[endY][endX] = board[startY][startX]; // Sposta la pedina
+        board[startY][startX] = null;             // Rimuove la pedina dalla posizione precedente
+
+        // other.println("updateBoard#" + startPosition + "#" + endPosition);
+
+        // Da controllare cosa succese alla board
 
         // Cambia turno
         // game.changeTurn((turn+1)%2);
@@ -124,8 +133,8 @@ public class Server {
     }
 
 
-    static public void manageShowPossibleMoves(Game game,String[] messageFromClient, PrintWriter out, Pedina[][] board){
-        Posizione posizione = getPositionFromString(game, messageFromClient[1]);
+    static public void manageShowPossibleMoves(String[] messageFromClient, PrintWriter out){
+        Posizione posizione = getPositionFromString(messageFromClient[1]);
 
         System.out.println("Posizione arrivata al server: " + posizione.toString());
 
@@ -150,7 +159,7 @@ public class Server {
     }
 
     //Ritorna la posizone a partire da una stringa
-    static public Posizione getPositionFromString(Game game,String message){
+    static public Posizione getPositionFromString(String message){
         String coppiaDati = message;
         String[] split = coppiaDati.split(",");
         int x = Integer.parseInt(split[0]);

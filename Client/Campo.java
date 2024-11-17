@@ -86,9 +86,8 @@ public class Campo {
                         if (localPedinaCliccata != null) {
                             for (Posizione pos : localPedinaCliccata.getPawnPossibleMoves()) {
                                 if (pos.getX() == col && pos.getY() == row) {
-                                    movePiece(row, col, localPedinaCliccata);
+                                    movePiece(row, col, localPedinaCliccata, position);
                                     setPedinaCliccata(null);
-                                    out.println("movePiece#" + position);
                                 }
                             }
                         }
@@ -108,7 +107,7 @@ public class Campo {
     }
 
     // Coordinate sballate
-    public void movePiece(int row, int col, PedinaGrafica piece) {
+    public void movePiece(int row, int col, PedinaGrafica piece, Posizione position) {
         Posizione oldPosition = piece.getPosition();
         int oldRow = oldPosition.getY();
         int oldCol = oldPosition.getX();
@@ -155,6 +154,9 @@ public class Campo {
         // Aggiorna logicamente scacchiera (lato server)
         this.board[oldRow][oldCol] = null;
         this.board[row][col] = new Pedina(row, col, piece.getColor().equals(Color.DARK_GRAY) ? "black" : "white");
+
+        // Aggiornare a lato server
+        out.println("movePiece#" + oldRow + "," + oldCol + "#" + col + "," + row);
     }
 
     public void setPedinaCliccata(PedinaGrafica piece) {

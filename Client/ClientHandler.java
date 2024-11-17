@@ -48,8 +48,6 @@ public class ClientHandler extends Thread {
                             break;
                         case "pieceMoved":
                             break;
-                        case "muoviAncheTe":
-                            break;
                         case "mangiata":
                             break;
                         case "isDama":
@@ -107,9 +105,9 @@ public class ClientHandler extends Thread {
                 int x = Integer.parseInt(coords[0]);
                 int y = Integer.parseInt(coords[1]);
                 Posizione pos = new Posizione(x, y);
+
                 piece.setPosition(pos);
                 campo.setPedinaCliccata(piece);
-
                 allPossibleMoves.add(pos);
 
                 System.out.println("Mosse possibili: " + pos);
