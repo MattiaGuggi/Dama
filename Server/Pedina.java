@@ -54,7 +54,7 @@ public class Pedina {
         // Puó andare solo in avanti quindi controllo solo sulle righe successive
         // Parte dal basso, dove le righe partono da 7 a salire (non da 0)
         // Per provare, si puó muovere solo pedine in basso
-        if (this.color.equals("black")) {
+        if (this.color.equals("white")) {
             if (x > 0 && y < MAX-1 && board[x-1][y+1] == null) {
                 allPossibleMoves.add(new Posizione(x-1, y+1));
             }
@@ -62,7 +62,7 @@ public class Pedina {
                 allPossibleMoves.add(new Posizione(x-1, y-1));
             }
         }
-        else if (this.color.equals("white")) {
+        else if (this.color.equals("black")) {
             if (x < MAX-1 && y < MAX-1 && board[x+1][y+1] == null) {
                 allPossibleMoves.add(new Posizione(x-1, y+1));
             }

@@ -96,6 +96,9 @@ public class Game {
     }
 
 
+    public void changeTurn(int turn) {
+        this.turn = turn;
+    }
     public int getTurn(){
         return this.turn;
     }

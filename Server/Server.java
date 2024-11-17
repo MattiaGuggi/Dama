@@ -12,8 +12,8 @@ public class Server {
     private static Boolean isConnected = false;
     private static Socket previousSocket = null;
     private static Socket newSocket = null;
-    private static PrintWriter you;
-    private static PrintWriter other;
+    private static PrintWriter you = null;
+    private static PrintWriter other = null;
     public static void main(String[] args) {
         try{
             ServerSocket serverSocket = new ServerSocket(50000);
@@ -70,7 +70,7 @@ public class Server {
             Boolean endGame = false;
 
             while(!endGame){
-                String result = "";
+                String result = ""; 
                 int turn = game.getTurn();
 
                 if (turn == 0) {
@@ -78,14 +78,11 @@ public class Server {
                 }
                 else if (turn == 1) {
                     result = in1.readLine();
-
                 }
                 
                 if(result != null){
                     String[] words = result.split("#");
-                    //Ca
-
-
+                    
 
                     if (words[0].equals("movePiece")) {
                         
@@ -119,30 +116,32 @@ public class Server {
         int x = posizione.getX();
         int y = posizione.getY();
 
-        other.print("muoviAncheTe#vittoria");
-
-        you.print("vittoria");
+        // Stampa le conseguenze della mossa
         
 
     }
 
 
     static public void manageShowPossibleMoves(Game game,String[] messageFromClient, PrintWriter out){
-
         Posizione posizione = getPositionFromString(game, messageFromClient[1]);
 
         int y = posizione.getY();
         int x = posizione.getX();
+        Pedina[][] board = game.getBoard();
+        String msg = "";
 
         // Controllare se dobbiam ore
-        ArrayList<Posizione> allPossibleMoves = game.getBoard()[y][x].getPossibleMoves(game.getBoard()); // Cerchiamo mosse possibili
-        String msg = "";
+        ArrayList<Posizione> allPossibleMoves = board[y][x].getPossibleMoves(board); // Cerchiamo mosse possibili
+
+        // Reverso coordinate
         for (Posizione pos : allPossibleMoves) {
-            msg += pos + ";";
+            msg += pos.getY() + "," + pos.getX() + ";";
         }
-        msg = msg.substring(0, msg.length() - 1);
+
+        if (msg.length() > 0)
+            msg = msg.substring(0, msg.length() - 1);
         
-        out.println("showPossibleMoves#" + msg);
+        out.println("showPossibleMoves#" + msg); // Errore: msg é vuoto
     }
 
     //Ritorna la posizone a partire da una stringa

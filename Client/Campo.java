@@ -15,7 +15,7 @@ public class Campo {
     private JPanel[][] cells = new JPanel[MAX][MAX];
     private ArrayList<PedinaGrafica> allPedineGrafiche = new ArrayList<>();
     private PedinaGrafica pedinaCliccata = null; // Tiene traccia della pedina cliccata prima che deve essere spostata
-    private PrintWriter out;
+    private PrintWriter out = null;
     private ArrayList<Posizione> allPossibleMoves = new ArrayList<>();
 
     public Campo(Pedina[][] board, PrintWriter out) {
@@ -43,25 +43,27 @@ public class Campo {
                 
                 // Se c'é una pedina
                 if (board[i][j] != null) {
-                    PedinaGrafica piece = new PedinaGrafica(new Posizione(i, j));
+                    PedinaGrafica piece = new PedinaGrafica(new Posizione(j, i));
 
-                    // Listener per click sulla pedina
-                    piece.addMouseListener(new MouseAdapter() {
-                        @Override
-                        public void mouseClicked(MouseEvent e) {
-                            pedinaCliccata = piece;
-                            // Resetta l'opacità di tutte le pedine
-                            if (allPedineGrafiche != null) {
-                                for (PedinaGrafica pedina : allPedineGrafiche) {
-                                    pedina.setOpacity(1.0f);
+                    // Listener per click sulla pedina solo se del colore giusto
+                    if (i > MAX / 2) {
+                        piece.addMouseListener(new MouseAdapter() {
+                            @Override
+                            public void mouseClicked(MouseEvent e) {
+                                pedinaCliccata = piece;
+                                // Resetta l'opacità di tutte le pedine
+                                if (allPedineGrafiche != null) {
+                                    for (PedinaGrafica pedina : allPedineGrafiche) {
+                                        pedina.setOpacity(1.0f);
+                                    }
                                 }
-                            }
-                            // Imposta l'opacità della pedina cliccata
-                            piece.setOpacity(0.5f);
+                                // Imposta l'opacità della pedina cliccata
+                                piece.setOpacity(0.5f);
 
-                            out.println("showPossibleMoves#" + pedinaCliccata.toString());
-                        }
-                    });
+                                out.println("showPossibleMoves#" + pedinaCliccata.toString());
+                            }
+                        });
+                    }
                     allPedineGrafiche.add(piece);
                     piece.setColor(board[i][j].getColor().equals("black") ? Color.DARK_GRAY : Color.LIGHT_GRAY);
                     piece.setPreferredSize(new Dimension(60, 60));
@@ -76,12 +78,12 @@ public class Campo {
                 cells[i][j].addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
-                        // Controlli
                         
+                        // Controllo che sia una posizione valida
                         if (allPossibleMoves.size() > 0) {
                             for (Posizione pos : allPossibleMoves) {
-                                if (pos.getX() == row && pos.getY() == col) {
-                                    movePiece(row, col, new PedinaGrafica(position));
+                                if (pos.getX() == col && pos.getY() == row) {
+                                    movePiece(row, col, pedinaCliccata);
                                 }
                             }
                         }
@@ -98,10 +100,11 @@ public class Campo {
         frame.setVisible(true);
     }
 
+    // Coordinate sballate
     public void movePiece(int row, int col, PedinaGrafica piece) {
         Posizione oldPosition = piece.getPosition();
-        int oldRow = oldPosition.getX();
-        int oldCol = oldPosition.getY();
+        int oldRow = oldPosition.getY();
+        int oldCol = oldPosition.getX();
 
         // Rimuovi pedina dalla cella attuale
         cells[oldRow][oldCol].remove(piece);
@@ -129,6 +132,7 @@ public class Campo {
     }
 
     public void setPossibleMoves (ArrayList<Posizione> allPossibleMoves) {
+        this.allPossibleMoves.clear(); // Pulisco sempre prima
         this.allPossibleMoves = allPossibleMoves;
     }
 }

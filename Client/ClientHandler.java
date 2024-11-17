@@ -9,7 +9,7 @@ import java.util.ArrayList;
 public class ClientHandler extends Thread {
     private Boolean partitaFinita = false;
     private final int MAX = 8;
-    private Campo campo;
+    private Campo campo = null;
 
     @Override
     public void run(){
@@ -30,6 +30,7 @@ public class ClientHandler extends Thread {
                 //Formato generale: NomeComando#Data1#Data2#Data3....
                 if(result != null){
                     //Devo decodificare la stringa che ho appena ricevuto
+                    System.out.println("Result: " + result);
 
                     String[] words = result.split("#");
                     ArrayList<Posizione> allPossibleMoves = new ArrayList<>();
@@ -37,25 +38,36 @@ public class ClientHandler extends Thread {
                     if(words[0].equals("createGame")){
                         // Formato result: comando#dati#colore dati: x,y;
                         System.out.println(words[1]);
-                        this.createGame(campo, result, out);
+                        this.createGame(result, out);
                     }
                     else if (words[0].equals("showPossibleMoves")) {
+                        if (words.length == 0) break;
                         String[] coppiaDati = words[1].split(";");
 
+                        // Prendo tutte le posizioni possibili
                         for (int i=0 ; i<coppiaDati.length ; i++) {
                             String[] coords = coppiaDati[i].split(","); 
                             int x = Integer.parseInt(coords[0]);
                             int y = Integer.parseInt(coords[1]);
 
                             allPossibleMoves.add(new Posizione(x, y));
-                            campo.setPossibleMoves(allPossibleMoves);
+                        }
 
-                            for (Posizione pos : allPossibleMoves) {
-                                System.out.println("Posizione possibile:  " + pos.toString());
-                            }
+                        // Le passo al campo
+                        if (allPossibleMoves.size() > 0) {
+                            campo.setPossibleMoves(allPossibleMoves);
                         }
                     }
-                    else if (words[0].equals("movePiece")) {
+                    else if (words[0].equals("muoviAncheTe")) {
+                        
+                    }
+                    else if (words[0].equals("mangiata")) {
+
+                    }
+                    else if (words[0].equals("isDama")) {
+
+                    }
+                    else if (words[0].equals("win")) {
 
                     }
                 }
@@ -69,7 +81,7 @@ public class ClientHandler extends Thread {
         }
     }
 
-    public void createGame (Campo campo, String result, PrintWriter out) {
+    public void createGame (String result, PrintWriter out) {
         System.out.println("La partita sta per iniziare!");
 
         String[] messageSplitted = result.split("#");
@@ -92,12 +104,8 @@ public class ClientHandler extends Thread {
         }
         
         // Crea un campo grafico basato sul campo su lato server
-        campo = new Campo(board, out);
-        campo.drawBoard();
-    }
-
-    public void movePiece(int x, int y, PedinaGrafica selectedPiece) {
-        campo.movePiece(x, y, selectedPiece);
+        this.campo = new Campo(board, out);
+        this.campo.drawBoard();
     }
 
 }
