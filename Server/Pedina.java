@@ -33,17 +33,6 @@ public class Pedina {
         return this.color + "," + this.posizione.getString(reverse);
     }
 
-    
-    
-    // Deve mostrare sul campo grafico dove puó muovere e non sul terminale
-    public void showPossibleMoves(Pedina[][] board) {
-        ArrayList<Posizione> possibleMoves = this.getPossibleMoves(board);
-
-        for (Posizione pos : possibleMoves) {
-            System.out.println("Posizione possibile: " + pos);
-        }
-    }
-
     // Devo ritornare tutte le posizioni in cui puó andare la pedina cliccata
     public ArrayList<Posizione> getPossibleMoves(Pedina[][] board) {
         int x = posizione.getX();

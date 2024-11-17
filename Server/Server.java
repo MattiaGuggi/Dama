@@ -57,6 +57,7 @@ public class Server {
     public static void startGame(BufferedReader in,BufferedReader in1,PrintWriter out,PrintWriter out1){
         try{
             Game game = new Game();
+            Pedina[][] board = game.getBoard();
 
             String board1 = game.stringifyBoard(true);
             String board2 = game.stringifyBoard(false);
@@ -87,15 +88,15 @@ public class Server {
                     if (words[0].equals("movePiece")) {
                         
                         if(turn == 0)
-                            manageMovePiece(game,words,out,out1);
-                        manageMovePiece(game, words, out1, out);
+                            manageMovePiece(game,words,out,out1,turn,board);
+                        manageMovePiece(game, words, out1, out,turn,board);
 
                     }
                     else if (words[0].equals("showPossibleMoves")) {
                         if(turn == 0)
-                            manageShowPossibleMoves(game,words,out);
+                            manageShowPossibleMoves(game,words,out,board);
                         else
-                            manageShowPossibleMoves(game, words, out1);
+                            manageShowPossibleMoves(game, words, out1,board);
                     }
                 }
                 endGame = game.checkWin();
@@ -110,24 +111,27 @@ public class Server {
     }
 
 
-    static public void manageMovePiece(Game game,String[] messageFromClient,PrintWriter you,PrintWriter other){
+    static public void manageMovePiece(Game game,String[] messageFromClient,PrintWriter you,PrintWriter other,int turn, Pedina[][] board){
         Posizione posizione = getPositionFromString(game, messageFromClient[1]);
 
         int x = posizione.getX();
         int y = posizione.getY();
 
-        // Stampa le conseguenze della mossa
-        
+        // Cambia turno
+        // game.changeTurn((turn+1)%2);
 
+        // Stampa le conseguenze della mossa
+        you.println("pieceMoved#");
     }
 
 
-    static public void manageShowPossibleMoves(Game game,String[] messageFromClient, PrintWriter out){
+    static public void manageShowPossibleMoves(Game game,String[] messageFromClient, PrintWriter out, Pedina[][] board){
         Posizione posizione = getPositionFromString(game, messageFromClient[1]);
+
+        System.out.println("Posizione arrivata al server: " + posizione.toString());
 
         int y = posizione.getY();
         int x = posizione.getX();
-        Pedina[][] board = game.getBoard();
         String msg = "";
 
         // Controllare se dobbiam ore
@@ -138,10 +142,12 @@ public class Server {
             msg += pos.getY() + "," + pos.getX() + ";";
         }
 
-        if (msg.length() > 0)
+        if (msg.length() > 0) {
             msg = msg.substring(0, msg.length() - 1);
-        
-        out.println("showPossibleMoves#" + msg); // Errore: msg é vuoto
+            out.println("showPossibleMoves#" + msg);
+        }
+        else
+            out.print("showPossibleMoves#");
     }
 
     //Ritorna la posizone a partire da una stringa
@@ -153,8 +159,7 @@ public class Server {
         if (game.getTurn() == 0) {
             // Reverse le coordinate perchè:
             // turn = 0 -> Vuol dire che è turno del nero
-            // Se è nero, la matrice lato client ha il nero sotto. Pero dal server il nero è
-            // sopra
+            // Se è nero, la matrice lato client ha il nero sotto. Pero dal server il nero è sopra
             // Per questo devo reversare
             x = game.getMax() - x - 1;
             y = game.getMax() - y - 1;
