@@ -2,11 +2,14 @@ package Client;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
+
 import Server.Posizione;
 
 class PedinaGrafica extends JComponent {
     private Color color;
     private Posizione posizione;
+    private ArrayList<Posizione> allPossibleMoves = new ArrayList<>();
 
     public PedinaGrafica(Posizione posizione) {
         this.posizione = posizione;
@@ -39,6 +42,14 @@ class PedinaGrafica extends JComponent {
         super.paintComponent(g);
         g.setColor(color);
         g.fillOval(10, 10, getWidth() - 20, getHeight() - 20);
+    }
+
+    public void setPawnPossibleMoves(ArrayList<Posizione> allPossibleMoves) {
+        this.allPossibleMoves = allPossibleMoves;
+    }
+
+    public ArrayList<Posizione> getPawnPossibleMoves() {
+        return this.allPossibleMoves;
     }
 
     @Override

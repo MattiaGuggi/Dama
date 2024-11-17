@@ -110,7 +110,6 @@ public class Server {
         }
     }
 
-
     static public void manageMovePiece(Game game,String[] messageFromClient,PrintWriter you,PrintWriter other,int turn, Pedina[][] board){
         Posizione posizione = getPositionFromString(game, messageFromClient[1]);
 
@@ -166,6 +165,4 @@ public class Server {
         }
         return new Posizione(x, y);
     }
-
-    
 }

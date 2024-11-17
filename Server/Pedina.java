@@ -53,10 +53,10 @@ public class Pedina {
         }
         else if (this.color.equals("black")) {
             if (x < MAX-1 && y < MAX-1 && board[x+1][y+1] == null) {
-                allPossibleMoves.add(new Posizione(x-1, y+1));
+                allPossibleMoves.add(new Posizione(x+1, y+1));
             }
             if (x < MAX-1 && y > 0 && board[x+1][y-1] == null) {
-                allPossibleMoves.add(new Posizione(x-1, y-1));
+                allPossibleMoves.add(new Posizione(x+1, y-1));
             }
         }
 

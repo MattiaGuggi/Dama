@@ -40,7 +40,11 @@ public class ClientHandler extends Thread {
                             this.createGame(result, out);
                             break;
                         case "showPossibleMoves":
-                            this.handlePossibleMoves(words[1]);
+                            if (words.length > 0)
+                                this.handlePossibleMoves(words[1]);
+                            else
+                                System.out.println("Non ci sono mosse possibili");
+
                             break;
                         case "pieceMoved":
                             break;
@@ -93,7 +97,8 @@ public class ClientHandler extends Thread {
 
     public void handlePossibleMoves(String words) {
         String[] coppiaDati = words.split(";");
-                
+        PedinaGrafica piece = campo.getPedinaCliccata();
+        
         // Prendo tutte le posizioni possibili
         ArrayList<Posizione> allPossibleMoves = new ArrayList<>();
         for (String coppia : coppiaDati) {
@@ -101,14 +106,19 @@ public class ClientHandler extends Thread {
             if (coords.length == 2) {
                 int x = Integer.parseInt(coords[0]);
                 int y = Integer.parseInt(coords[1]);
+                Posizione pos = new Posizione(x, y);
+                piece.setPosition(pos);
+                campo.setPedinaCliccata(piece);
 
-                allPossibleMoves.add(new Posizione(x, y));
+                allPossibleMoves.add(pos);
+
+                System.out.println("Mosse possibili: " + pos);
             }
         }
 
-        // Le passo al campo
+        // Setto le nuove mosse possibili di una pedina
         if (!allPossibleMoves.isEmpty()) {
-            this.campo.setPossibleMoves(allPossibleMoves);
+            piece.setPawnPossibleMoves(allPossibleMoves);
         }
     }
 
