@@ -46,24 +46,7 @@ public class Campo {
 
                     // Listener per click sulla pedina solo se del colore giusto
                     if (i > MAX / 2) {
-                        piece.addMouseListener(new MouseAdapter() {
-                            @Override
-                            public void mouseClicked(MouseEvent e) {
-                                setPedinaCliccata(piece);
-
-                                if (piece != null) {
-                                    piece.setOpacity(1.0f);
-                                }
-
-                                System.out.println("Nuova pedina selezionata: " + piece);
-                                
-                                piece.setOpacity(0.5f);
-                                
-                                if (piece != null) {
-                                    out.println("showPossibleMoves#" + piece);
-                                }
-                            }
-                        });
+                        handlePawnClick(piece);
                     }
                     allPedineGrafiche.add(piece);
                     piece.setColor(board[i][j].getColor().equals("black") ? Color.DARK_GRAY : Color.LIGHT_GRAY);
@@ -73,29 +56,7 @@ public class Campo {
                 }
 
                 // Listener per click sulla cella
-                final Posizione position = new Posizione(j, i);
-                final int row = i;
-                final int col = j;
-                cells[i][j].addMouseListener(new MouseAdapter() {
-                    @Override
-                    public void mouseClicked(MouseEvent e) {
-                        PedinaGrafica localPedinaCliccata = getPedinaCliccata();
-
-                        System.out.println("Hai cliccato sulla casella: " + col + "," + row);
-                        // Controllo che sia una posizione valida
-                        if (localPedinaCliccata != null) {
-                            for (Posizione pos : localPedinaCliccata.getPawnPossibleMoves()) {
-                                if (pos.getX() == col && pos.getY() == row) {
-                                    movePiece(row, col, localPedinaCliccata, position);
-                                    setPedinaCliccata(null);
-                                }
-                            }
-                        }
-                        else {
-                            System.out.println("ArrayList vuoto");
-                        }
-                    }
-                });
+                handleCellClick(i, j);
 
                 frame.add(cells[i][j]);
             }
@@ -107,11 +68,11 @@ public class Campo {
     }
 
     // Coordinate sballate
-    public void movePiece(int row, int col, PedinaGrafica piece, Posizione position) {
+    public void movePiece(int row, int col) {
+        PedinaGrafica piece = getPedinaCliccata();
         Posizione oldPosition = piece.getPosition();
         int oldRow = oldPosition.getY();
         int oldCol = oldPosition.getX();
-        piece.setOpacity(1.0f);
 
         // Rimuovi pedina dalla cella attuale
         cells[oldRow][oldCol].remove(piece);
@@ -123,25 +84,10 @@ public class Campo {
 
         // Rimette pedina aggiornata in ArrayList
         PedinaGrafica newPiece = new PedinaGrafica(new Posizione(col, row));
-        
-        newPiece.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                setPedinaCliccata(newPiece);
 
-                if (newPiece != null) {
-                    newPiece.setOpacity(1.0f);
-                }
-
-                System.out.println("Nuova pedina selezionata: " + newPiece);
-                
-                newPiece.setOpacity(0.5f);
-                
-                if (newPiece != null) {
-                    out.println("showPossibleMoves#" + newPiece);
-                }
-            }
-        });
+        newPiece.setColor(piece.getColor());
+        newPiece.setOpacity(1.0f);
+        handlePawnClick(newPiece);
 
         allPedineGrafiche.add(newPiece);
 
@@ -157,6 +103,52 @@ public class Campo {
 
         // Aggiornare a lato server
         out.println("movePiece#" + oldRow + "," + oldCol + "#" + col + "," + row);
+    }
+
+    public void handlePawnClick(PedinaGrafica piece) {
+        piece.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                setPedinaCliccata(piece);
+
+                if (piece != null) {
+                    piece.setOpacity(1.0f);
+                }
+
+                System.out.println("Nuova pedina selezionata: " + piece);
+                
+                piece.setOpacity(0.5f);
+                
+                if (piece != null) {
+                    out.println("showPossibleMoves#" + piece);
+                }
+            }
+        });
+    }
+
+    public void handleCellClick(int i, int j) {
+        final int row = i;
+        final int col = j;
+        cells[i][j].addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                PedinaGrafica localPedinaCliccata = getPedinaCliccata();
+
+                System.out.println("Hai cliccato sulla casella: " + col + "," + row);
+                // Controllo che sia una posizione valida
+                if (localPedinaCliccata != null) {
+                    for (Posizione pos : localPedinaCliccata.getPawnPossibleMoves()) {
+                        if (pos.getX() == col && pos.getY() == row) {
+                            movePiece(row, col);
+                            setPedinaCliccata(null);
+                        }
+                    }
+                }
+                else {
+                    System.out.println("ArrayList vuoto");
+                }
+            }
+        });
     }
 
     public void setPedinaCliccata(PedinaGrafica piece) {
