@@ -10,8 +10,6 @@ public class Server {
     private static Boolean isConnected = false;
     private static Socket previousSocket = null;
     private static Socket newSocket = null;
-    private static PrintWriter you = null;
-    private static PrintWriter other = null;
     private static Game game = null;
     private static Pedina[][] board = null;
     public static void main(String[] args) {
@@ -83,12 +81,15 @@ public class Server {
                 
                 if(result != null){
                     String[] words = result.split("#");
+
+                    System.out.println("Words: " + Arrays.toString(words));
                     
                     switch(words[0]) {
                         case "movePiece":
                             if(turn == 0)
                                 manageMovePiece(words,out,out1,turn);
-                            manageMovePiece(words, out1, out,turn);
+                            else
+                                manageMovePiece(words, out1, out,turn);
                             break;
                         case "showPossibleMoves":
                             if(turn == 0)
@@ -119,24 +120,23 @@ public class Server {
         int endY = endPosition.getY();
 
         board[endY][endX] = board[startY][startX]; // Sposta la pedina
-        board[startY][startX] = null;             // Rimuove la pedina dalla posizione precedente
-
-        // other.println("updateBoard#" + startPosition + "#" + endPosition);
+        board[startY][startX] = null; // Rimuove la pedina dalla posizione precedente
 
         // Da controllare cosa succese alla board
 
         // Cambia turno
         // game.changeTurn((turn+1)%2);
 
-        // Stampa le conseguenze della mossa
+        // Notifica l'altro client di spostare anche nella sua board
+        other.println("updateBoard#" + startPosition + "#" + endPosition + "#" + game.getTurn());
+
+        // Cosa succede alla board
         you.println("pieceMoved#");
     }
 
 
     static public void manageShowPossibleMoves(String[] messageFromClient, PrintWriter out){
         Posizione posizione = getPositionFromString(messageFromClient[1]);
-
-        System.out.println("Posizione arrivata al server: " + posizione.toString());
 
         int y = posizione.getY();
         int x = posizione.getX();

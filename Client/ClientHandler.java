@@ -48,6 +48,10 @@ public class ClientHandler extends Thread {
                             break;
                         case "pieceMoved":
                             break;
+                        case "updateBoard":
+                            if (words.length > 0 )
+                                this.handleUpdateBoard(words);
+                            break;
                         case "mangiata":
                             break;
                         case "isDama":
@@ -95,7 +99,7 @@ public class ClientHandler extends Thread {
 
     public void handlePossibleMoves(String words) {
         String[] coppiaDati = words.split(";");
-        PedinaGrafica piece = campo.getPedinaCliccata();
+        PedinaGrafica piece = this.campo.getPedinaCliccata();
         
         // Prendo tutte le posizioni possibili
         ArrayList<Posizione> allPossibleMoves = new ArrayList<>();
@@ -106,8 +110,6 @@ public class ClientHandler extends Thread {
                 int y = Integer.parseInt(coords[1]);
                 Posizione pos = new Posizione(x, y);
 
-                piece.setPosition(pos);
-                campo.setPedinaCliccata(piece);
                 allPossibleMoves.add(pos);
 
                 System.out.println("Mosse possibili: " + pos);
@@ -120,4 +122,28 @@ public class ClientHandler extends Thread {
         }
     }
 
+    public void handleUpdateBoard(String[] words) {
+        int turn = Integer.parseInt(words[3]);
+        Posizione startPosition = getPositionFromString(words[1], turn);
+        Posizione endPosition = getPositionFromString(words[2], turn);
+
+        int startX = startPosition.getX();
+        int startY = startPosition.getY();
+        int endX = endPosition.getX();
+        int endY = endPosition.getY();
+
+        System.out.println("Pedina mossa: " + startX + "," + startY);
+        System.out.println("Pedina finale: " + endX + "," + endY);
+
+        campo.movePiece(startX, startY, endX, endY, turn);
+    }
+    //Ritorna la posizone a partire da una stringa
+    public Posizione getPositionFromString(String message, int turn){
+        String coppiaDati = message;
+        String[] split = coppiaDati.split(",");
+        int x = Integer.parseInt(split[0]);
+        int y = Integer.parseInt(split[1]);
+        
+        return new Posizione(x, y);
+    }
 }
