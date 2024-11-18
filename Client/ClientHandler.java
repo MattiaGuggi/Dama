@@ -122,19 +122,18 @@ public class ClientHandler extends Thread {
     }
 
     public void handleUpdateBoard(String[] words) {
-        int turn = Integer.parseInt(words[3]);
-        Posizione startPosition = getPositionFromString(words[1], turn);
-        Posizione endPosition = getPositionFromString(words[2], turn);
+        Posizione startPosition = getPositionFromString(words[1]);
+        Posizione endPosition = getPositionFromString(words[2]);
 
         int startX = startPosition.getX();
         int startY = startPosition.getY();
         int endX = endPosition.getX();
         int endY = endPosition.getY();
 
-        campo.movePiece(startX, startY, endX, endY, turn);
+        campo.movePiece(startX, startY, endX, endY);
     }
     //Ritorna la posizone a partire da una stringa
-    public Posizione getPositionFromString(String message, int turn){
+    public Posizione getPositionFromString(String message){
         String coppiaDati = message;
         String[] split = coppiaDati.split(",");
         int x = Integer.parseInt(split[0]);

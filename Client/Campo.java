@@ -16,7 +16,6 @@ public class Campo {
     private ArrayList<PedinaGrafica> allPedineGrafiche = new ArrayList<>();
     private PedinaGrafica pedinaCliccata; // Tiene traccia della pedina cliccata prima che deve essere spostata
     private PrintWriter out = null;
-    private int clientNumber; // Come il turn in Game per identificare i client
 
     public Campo(Pedina[][] board, PrintWriter out) {
         this.board = board;
@@ -87,7 +86,7 @@ public class Campo {
             
                         for (Posizione pos : localPedinaCliccata.getPawnPossibleMoves()) {
                             if (pos.getX() == col && pos.getY() == row) {
-                                movePiece(oldRow, oldCol, row, col, clientNumber);
+                                movePiece(oldRow, oldCol, row, col);
                             }
                         }
                     }
@@ -115,7 +114,7 @@ public class Campo {
     }
 
     // Coordinate sballate
-    public void movePiece(int oldRow, int oldCol, int row, int col, int turn) {
+    public void movePiece(int oldRow, int oldCol, int row, int col) {
         // Bisogna capire se é chiamato per spostare propria pedina o dell' avversario
         PedinaGrafica piece = getPedinaFromPosition(new Posizione(oldCol, oldRow));
     
@@ -158,7 +157,18 @@ public class Campo {
     
         // Aggiorna logicamente la scacchiera
         this.board[oldRow][oldCol] = null;
-        this.board[row][col] = new Pedina(row, col, piece.getColor().equals(Color.DARK_GRAY) ? "black" : "white");
+        this.board[row][col] = new Pedina(col, row, piece.getColor().equals(Color.DARK_GRAY) ? "black" : "white");
+
+        System.out.println("Campo attuale in Campo:");
+        for (int i=0 ; i<8 ; i++) {
+            for (int j=0 ; j<8 ; j++) {
+                if (this.board[i][j] == null)
+                    System.out.print("---- "); // Placeholder for empty squares
+                else
+                    System.out.print(this.board[i][j] + " ");
+            }
+            System.out.println("");
+        }
 
         // Deseleziona la pedina cliccata
         setPedinaCliccata(null);

@@ -120,14 +120,15 @@ public class Server {
         int endY = endPosition.getY();
 
         // !!Da aggiornare correttamente!!
-        board[endY][endX] = board[startY][startX]; // Sposta la pedina
+        String color = board[startY][startX].getColor();
+        board[endY][endX] = new Pedina(endX, endY, color); // Crea nuova pedina
         board[startY][startX] = null; // Rimuove la pedina dalla posizione precedente
 
         System.out.println("Scacchiera aggiornata lato server (unica):");
         for (int i=0 ; i<8 ; i++) {
             for (int j=0 ; j<8 ; j++) {
                 if (board[i][j] == null)
-                    System.out.print("- "); // Placeholder for empty squares
+                    System.out.print("---- "); // Placeholder for empty squares
                 else
                     System.out.print(board[i][j] + " ");
             }
@@ -140,7 +141,7 @@ public class Server {
         // game.changeTurn((turn+1)%2);
 
         // Notifica l'altro client di spostare anche nella sua board
-        other.println("updateBoard#" + startPosition + "#" + endPosition + "#" + game.getTurn());
+        other.println("updateBoard#" + startPosition + "#" + endPosition);
 
         // Cosa succede alla board
         you.println("pieceMoved#");

@@ -65,6 +65,6 @@ public class Pedina {
 
     @Override
     public String toString() {
-        return color.charAt(0) + "" + this.posizione; // e.g., "B" for "black" or "W" for "white"
+        return color.charAt(0) + "" + this.posizione;
     }
 }
