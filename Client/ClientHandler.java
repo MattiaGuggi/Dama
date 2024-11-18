@@ -36,7 +36,6 @@ public class ClientHandler extends Thread {
 
                     switch(words[0]) {
                         case "createGame":
-                            System.out.println(words[1]);
                             this.createGame(result, out);
                             break;
                         case "showPossibleMoves":
@@ -131,9 +130,6 @@ public class ClientHandler extends Thread {
         int startY = startPosition.getY();
         int endX = endPosition.getX();
         int endY = endPosition.getY();
-
-        System.out.println("Pedina mossa: " + startX + "," + startY);
-        System.out.println("Pedina finale: " + endX + "," + endY);
 
         campo.movePiece(startX, startY, endX, endY, turn);
     }

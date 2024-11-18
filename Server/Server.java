@@ -119,8 +119,20 @@ public class Server {
         int endX = endPosition.getX();
         int endY = endPosition.getY();
 
+        // !!Da aggiornare correttamente!!
         board[endY][endX] = board[startY][startX]; // Sposta la pedina
         board[startY][startX] = null; // Rimuove la pedina dalla posizione precedente
+
+        System.out.println("Scacchiera aggiornata lato server (unica):");
+        for (int i=0 ; i<8 ; i++) {
+            for (int j=0 ; j<8 ; j++) {
+                if (board[i][j] == null)
+                    System.out.print("- "); // Placeholder for empty squares
+                else
+                    System.out.print(board[i][j] + " ");
+            }
+            System.out.println("");
+        }
 
         // Da controllare cosa succese alla board
 

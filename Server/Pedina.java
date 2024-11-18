@@ -62,4 +62,9 @@ public class Pedina {
 
         return allPossibleMoves;
     }
+
+    @Override
+    public String toString() {
+        return color.charAt(0) + "" + this.posizione; // e.g., "B" for "black" or "W" for "white"
+    }
 }

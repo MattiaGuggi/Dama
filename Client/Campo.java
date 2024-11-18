@@ -163,7 +163,7 @@ public class Campo {
         // Deseleziona la pedina cliccata
         setPedinaCliccata(null);
 
-        System.out.println("Coordinate da passare al server:" + oldCol + "," + oldRow + "#" + col + "," + row);
+        System.out.println("Messaggio da mandare al server: movePiece#" + oldCol + "," + oldRow + "#" + col + "," + row);
         // Comunica il movimento al server
         out.println("movePiece#" + oldCol + "," + oldRow + "#" + col + "," + row);
     }    
