@@ -93,13 +93,19 @@ public class Campo {
                         if(localPedinaCliccata == null || !isMyTurn())
                             return;
                         
+                        removeSquares();
+                        
+                        for (PedinaGrafica p : allPedineGrafiche) {
+                            p.setOpacity(1.0f);
+                        }
+
                         Posizione oldPosition = localPedinaCliccata.getPosition();
                         int oldRow = oldPosition.getY();
                         int oldCol = oldPosition.getX();
-            
+
                         for (Posizione pos : localPedinaCliccata.getPawnPossibleMoves()) {
                             if (pos.getX() == col && pos.getY() == row) {
-                                movePiece(oldRow, oldCol, row, col,true);
+                                    movePiece(oldRow, oldCol, row, col,true);
                             }
                         }
                     }
