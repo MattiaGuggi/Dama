@@ -90,10 +90,16 @@ public class ClientHandler extends Thread {
             Pedina pedina = new Pedina(x, y, colore);
             board[y][x] = pedina;
         }
-        
+
         // Crea un campo grafico basato sul campo su lato server
         this.campo = new Campo(board, out);
+        
+        //Settiamo il nostro colore
+        System.out.println("Il tuo colore + "+messageSplitted[2]);
+        this.campo.setColor(messageSplitted[2]);
+
         this.campo.drawBoard();
+
     }
 
     public void handlePossibleMoves(String words) {
@@ -102,6 +108,8 @@ public class ClientHandler extends Thread {
         
         // Prendo tutte le posizioni possibili
         ArrayList<Posizione> allPossibleMoves = new ArrayList<>();
+        //Rimuovo i possibili posti dove andare
+        campo.removeSquares();
         for (String coppia : coppiaDati) {
             String[] coords = coppia.split(",");
             if (coords.length == 2) {
@@ -110,8 +118,9 @@ public class ClientHandler extends Thread {
                 Posizione pos = new Posizione(x, y);
 
                 allPossibleMoves.add(pos);
-
+    
                 System.out.println("Mosse possibili: " + pos);
+                campo.showSquares(x, y);
             }
         }
 
@@ -122,6 +131,7 @@ public class ClientHandler extends Thread {
     }
 
     public void handleUpdateBoard(String[] words) {
+        System.out.println("DEVO UPDTAR LA FOWFDASDASDAS->"+words);
         Posizione startPosition = getPositionFromString(words[1]);
         Posizione endPosition = getPositionFromString(words[2]);
 
@@ -130,7 +140,8 @@ public class ClientHandler extends Thread {
         int endX = endPosition.getX();
         int endY = endPosition.getY();
 
-        campo.movePiece(startX, startY, endX, endY);
+        // Non sposta la pedina ma mette solo a null nel campo dell' avversario
+        campo.movePiece(startY, startX, endY, endX, false);
     }
     //Ritorna la posizone a partire da una stringa
     public Posizione getPositionFromString(String message){
@@ -138,6 +149,11 @@ public class ClientHandler extends Thread {
         String[] split = coppiaDati.split(",");
         int x = Integer.parseInt(split[0]);
         int y = Integer.parseInt(split[1]);
+
+        if(this.campo.getColor().equals("black")){
+            x = MAX - x - 1;
+            y = MAX - y - 1;
+        }
         
         return new Posizione(x, y);
     }

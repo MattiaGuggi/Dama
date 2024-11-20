@@ -12,6 +12,7 @@ public class Server {
     private static Socket newSocket = null;
     private static Game game = null;
     private static Pedina[][] board = null;
+
     public static void main(String[] args) {
         try{
             ServerSocket serverSocket = new ServerSocket(50000);
@@ -69,36 +70,36 @@ public class Server {
             Boolean endGame = false;
 
             while(!endGame){
+                PrintWriter you = out;
+                PrintWriter other =out1;
                 String result = ""; 
+                String playerColor = "black";
                 int turn = game.getTurn();
 
-                if (turn == 0) {
+                if (turn == 0)
                     result = in.readLine();
-                }
                 else if (turn == 1) {
                     result = in1.readLine();
+                    you = out1;
+                    other = out;
+                    playerColor = "white";
                 }
                 
                 if(result != null){
                     String[] words = result.split("#");
 
-                    System.out.println("Words: " + Arrays.toString(words));
+                    System.out.println("Words: " + Arrays.toString(words)+ "\nColor:"+playerColor);
                     
                     switch(words[0]) {
                         case "movePiece":
-                            if(turn == 0)
-                                manageMovePiece(words,out,out1,turn);
-                            else
-                                manageMovePiece(words, out1, out,turn);
+                                manageMovePiece(words,you,other,turn);
                             break;
                         case "showPossibleMoves":
-                            if(turn == 0)
-                                manageShowPossibleMoves(words,out);
-                            else
-                                manageShowPossibleMoves(words, out1);
+                                manageShowPossibleMoves(words,you,playerColor);
                             break;
                     }
                 }
+
                 endGame = game.checkWin();
             }
         }
@@ -124,11 +125,13 @@ public class Server {
         board[endY][endX] = new Pedina(endX, endY, color); // Crea nuova pedina
         board[startY][startX] = null; // Rimuove la pedina dalla posizione precedente
 
+
+
         System.out.println("Scacchiera aggiornata lato server (unica):");
         for (int i=0 ; i<8 ; i++) {
             for (int j=0 ; j<8 ; j++) {
                 if (board[i][j] == null)
-                    System.out.print("---- "); // Placeholder for empty squares
+                    System.out.print("---- ");
                 else
                     System.out.print(board[i][j] + " ");
             }
@@ -138,9 +141,9 @@ public class Server {
         // Da controllare cosa succese alla board
 
         // Cambia turno
-        // game.changeTurn((turn+1)%2);
-
+        game.changeTurn();
         // Notifica l'altro client di spostare anche nella sua board
+        //L'altro è sempre reversato rispetto a te
         other.println("updateBoard#" + startPosition + "#" + endPosition);
 
         // Cosa succede alla board
@@ -148,27 +151,32 @@ public class Server {
     }
 
 
-    static public void manageShowPossibleMoves(String[] messageFromClient, PrintWriter out){
+    static public void manageShowPossibleMoves(String[] messageFromClient, PrintWriter out, String color){
         Posizione posizione = getPositionFromString(messageFromClient[1]);
 
         int y = posizione.getY();
         int x = posizione.getX();
+
         String msg = "";
 
         // Controllare se dobbiam ore
         ArrayList<Posizione> allPossibleMoves = board[y][x].getPossibleMoves(board); // Cerchiamo mosse possibili
 
+        System.out.println("Mosse possibili"+allPossibleMoves);
         // Reverso coordinate
         for (Posizione pos : allPossibleMoves) {
-            msg += pos.getY() + "," + pos.getX() + ";";
+            //Se il nero mi ha mandando al richiesta, reverso le coordinate
+            if(color == "black"){
+                msg += (game.getMax() - 1 -pos.getX()) + "," + (game.getMax() - 1 -pos.getY()) + ";";
+            }
+            else
+                msg += pos.getX() + "," + pos.getY() + ";";
         }
 
         if (msg.length() > 0) {
             msg = msg.substring(0, msg.length() - 1);
             out.println("showPossibleMoves#" + msg);
         }
-        else
-            out.print("showPossibleMoves#");
     }
 
     //Ritorna la posizone a partire da una stringa
@@ -180,10 +188,11 @@ public class Server {
         if (game.getTurn() == 0) {
             // Reverse le coordinate perchè:
             // turn = 0 -> Vuol dire che è turno del nero
-            // Se è nero, la matrice lato client ha il nero sotto. Pero dal server il nero è sopra
+            // Se è nero, la matrice lato client ha il bianco sotto. Pero dal server il bianco è sopra
             // Per questo devo reversare
             x = game.getMax() - x - 1;
             y = game.getMax() - y - 1;
+            System.out.println("Coordinate reversate!");
         }
         return new Posizione(x, y);
     }

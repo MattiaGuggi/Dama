@@ -14,16 +14,23 @@ public class Campo {
     private Pedina[][] board;
     private JPanel[][] cells = new JPanel[MAX][MAX];
     private ArrayList<PedinaGrafica> allPedineGrafiche = new ArrayList<>();
-    private PedinaGrafica pedinaCliccata; // Tiene traccia della pedina cliccata prima che deve essere spostata
+    private PedinaGrafica pedinaCliccata = null; // Tiene traccia della pedina cliccata prima che deve essere spostata
     private PrintWriter out = null;
 
+    private String myColor;
+
+    private int turn = 1;
+
+    //Lista con tutti i posti consigliati possibili
+    private ArrayList<Square> squareList = new ArrayList<>();
+    
     public Campo(Pedina[][] board, PrintWriter out) {
         this.board = board;
         this.out = out;
     }
 
     public void drawBoard() {
-        JFrame frame = new JFrame("Dama");
+        JFrame frame = new JFrame("Dama-"+this.myColor);
 
         frame.setLayout(new GridLayout(MAX, MAX));
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -31,6 +38,7 @@ public class Campo {
         for (int i = 0; i < MAX; i++) {
             for (int j = 0; j < MAX; j++) {
                 cells[i][j] = new JPanel();
+
 
                 // Alterna i colori della scacchiera
                 if ((i + j) % 2 == 0) {
@@ -45,10 +53,13 @@ public class Campo {
                     PedinaGrafica piece = new PedinaGrafica(new Posizione(j, i));
 
                     // Listener per click sulla pedina solo se del colore giusto
-                    if (i > MAX / 2) {
+                    if (this.myColor.equals(board[i][j].getColor())) {
                         piece.addMouseListener(new MouseAdapter() {
                             @Override
                             public void mouseClicked(MouseEvent e) {
+                                //Se quando clicco non è il mio turno, non faccio niente
+                                if(!isMyTurn())
+                                    return;
                                 setPedinaCliccata(piece);
                                 System.out.println("Nuova pedina selezionata: " + piece);
 
@@ -79,6 +90,8 @@ public class Campo {
                     @Override
                     public void mouseClicked(MouseEvent e) {
                         PedinaGrafica localPedinaCliccata = getPedinaCliccata();
+                        if(localPedinaCliccata == null || !isMyTurn())
+                            return;
                         
                         Posizione oldPosition = localPedinaCliccata.getPosition();
                         int oldRow = oldPosition.getY();
@@ -86,7 +99,7 @@ public class Campo {
             
                         for (Posizione pos : localPedinaCliccata.getPawnPossibleMoves()) {
                             if (pos.getX() == col && pos.getY() == row) {
-                                movePiece(oldRow, oldCol, row, col);
+                                movePiece(oldRow, oldCol, row, col,true);
                             }
                         }
                     }
@@ -109,12 +122,13 @@ public class Campo {
             }
         }
 
-        System.out.println("Posizione da cercare e non trovata: " + position.getX() + "," + position.getY());
         return null;
     }
 
     // Coordinate sballate
-    public void movePiece(int oldRow, int oldCol, int row, int col) {
+    public void movePiece(int oldRow, int oldCol, int row, int col,Boolean callServer) {
+        //Quando clicco 
+        this.removeSquares();
         // Bisogna capire se é chiamato per spostare propria pedina o dell' avversario
         PedinaGrafica piece = getPedinaFromPosition(new Posizione(oldCol, oldRow));
     
@@ -135,8 +149,16 @@ public class Campo {
         newPiece.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                System.out.println("Nuova pedina selezionata: " + newPiece);
+                if (!isMyTurn())
+                    return;
+                
                 setPedinaCliccata(newPiece);
+
+                System.out.println("Nuova pedina selezionata: " + newPiece);
+
+                for (PedinaGrafica p : allPedineGrafiche) {
+                    p.setOpacity(1.0f);
+                }
     
                 newPiece.setOpacity(0.5f);
     
@@ -170,14 +192,56 @@ public class Campo {
             System.out.println("");
         }
 
+        //Modifico il mio turno, cosi non posso piu muovere
+        this.changeTurn();
+
         // Deseleziona la pedina cliccata
         setPedinaCliccata(null);
 
-        System.out.println("Messaggio da mandare al server: movePiece#" + oldCol + "," + oldRow + "#" + col + "," + row);
         // Comunica il movimento al server
-        out.println("movePiece#" + oldCol + "," + oldRow + "#" + col + "," + row);
+        if(callServer)
+            out.println("movePiece#" + oldCol + "," + oldRow + "#" + col + "," + row);
     }    
 
+    //Mostra graficamente i posti in cui puoi muoverti
+    public void showSquares(int x, int y){
+        Square div = new Square(x, y);
+        div.setPreferredSize(new Dimension(50, 50));
+
+        squareList.add(div);
+
+        cells[y][x].setLayout(new BorderLayout());
+        cells[y][x].add(div, BorderLayout.CENTER);
+        cells[y][x].revalidate();
+        cells[y][x].repaint(); 
+    }
+
+    public void removeSquares(){
+        for(Square square : squareList){
+            cells[square.getY()][square.getX()].remove(square);
+            cells[square.getY()][square.getX()].revalidate();
+            cells[square.getY()][square.getX()].repaint(); 
+        }
+    }
+    
+    public void changeTurn() {
+        this.turn = (turn + 1) % 2;
+    }
+
+    public Boolean isMyTurn(){
+        if(this.turn == 0 && this.myColor.equals("black"))
+            return true;
+        if(this.turn == 1 && this.myColor.equals("white"))
+            return true;
+        return false;
+    }
+    
+    public void setColor(String color){
+        this.myColor = color;
+    }
+    public String getColor(){
+        return this.myColor;
+    }
     public void setPedinaCliccata(PedinaGrafica piece) {
         this.pedinaCliccata = piece;
     }

@@ -5,7 +5,7 @@ public class Game {
  
     private Pedina[][] board = new Pedina[MAX][MAX];
     
-    private int turn = 0;
+    private int turn = 1;
     /* 0-> Primo giocatore che si collega al server (Nero)
      * 1-> Secondo giocatore che si collega al server (Bianco)
     */
@@ -32,10 +32,10 @@ public class Game {
         for(int i = 0;i<MAX;++i){
             for(int j = 0;j<MAX;++j){
                 if(sampleBoard[i][j] == 1){
-                    board[i][j] = new Pedina(j, i,"black");
+                    board[i][j] = new Pedina(j, i,"white");
                 }
                 else if(sampleBoard[i][j] == 2){
-                    board[i][j] = new Pedina(j, i,"white");
+                    board[i][j] = new Pedina(j, i,"black");
                 }
                 else{
                     board[i][j] = null;
@@ -96,8 +96,8 @@ public class Game {
     }
 
 
-    public void changeTurn(int turn) {
-        this.turn = turn;
+    public void changeTurn() {
+        this.turn = (turn + 1) % 2;
     }
     public int getTurn(){
         return this.turn;
