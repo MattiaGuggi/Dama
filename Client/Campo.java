@@ -212,7 +212,6 @@ public class Campo {
     //Mostra graficamente i posti in cui puoi muoverti
     public void showSquares(int x, int y){
         Square div = new Square(x, y);
-        div.setPreferredSize(new Dimension(50, 50));
 
         squareList.add(div);
 
