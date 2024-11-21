@@ -191,7 +191,7 @@ public class Campo {
         for (int i=0 ; i<8 ; i++) {
             for (int j=0 ; j<8 ; j++) {
                 if (this.board[i][j] == null)
-                    System.out.print("---- "); // Placeholder for empty squares
+                    System.out.print("---- ");
                 else
                     System.out.print(this.board[i][j] + " ");
             }
