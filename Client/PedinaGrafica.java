@@ -9,6 +9,7 @@ import Server.Posizione;
 class PedinaGrafica extends JComponent {
     private Color color;
     private Posizione posizione;
+    private Boolean isDama = false;
     private ArrayList<Posizione> allPossibleMoves = new ArrayList<>();
 
     public PedinaGrafica(Posizione posizione) {
@@ -35,6 +36,11 @@ class PedinaGrafica extends JComponent {
 
     public Posizione getPosition() {
         return this.posizione;
+    }
+
+    // Va ridisegnata cosí si capisce
+    public void setIsDama() {
+        this.isDama = true;
     }
 
     @Override
