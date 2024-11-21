@@ -5,6 +5,7 @@ import java.io.*;
 import Server.Pedina;
 import Server.Posizione;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class ClientHandler extends Thread {
     private Boolean partitaFinita = false;
@@ -131,7 +132,7 @@ public class ClientHandler extends Thread {
     }
 
     public void handleUpdateBoard(String[] words) {
-        System.out.println("DEVO UPDTAR LA FOWFDASDASDAS->"+words);
+        System.out.println("DEVO UPDTAR LA FOWFDASDASDAS->"+Arrays.toString(words));
         Posizione startPosition = getPositionFromString(words[1]);
         Posizione endPosition = getPositionFromString(words[2]);
 

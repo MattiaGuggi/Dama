@@ -131,7 +131,6 @@ public class Campo {
         return null;
     }
 
-    // Coordinate sballate
     public void movePiece(int oldRow, int oldCol, int row, int col,Boolean callServer) {
         //Quando clicco 
         this.removeSquares();
@@ -254,5 +253,4 @@ public class Campo {
     public PedinaGrafica getPedinaCliccata() {
         return this.pedinaCliccata;
     }
-    
 }

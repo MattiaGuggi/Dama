@@ -86,6 +86,8 @@ public class Pedina {
             if (p.getX() < 0 || p.getX() >= MAX || p.getY() < 0 || p.getY() >= MAX)
                 allPossibleMoves.remove(p);
         }
+
+        // In qualche modo va comunicato che é una mossa per mangiare
         
         return allPossibleMoves;
     }

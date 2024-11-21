@@ -147,6 +147,7 @@ public class Server {
         other.println("updateBoard#" + startPosition + "#" + endPosition);
 
         // Cosa succede alla board
+        // Da controllare le mangiate e le possibili doppie mangiate (potrebbe poter muovere ancora)
         you.println("pieceMoved#");
     }
 
