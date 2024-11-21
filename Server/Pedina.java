@@ -80,6 +80,12 @@ public class Pedina {
                 allPossibleMoves.add(new Posizione(x-2, y+2));
             }
         }
+
+        // Controlla che le posizioni siano tutte dentro la board
+        for (Posizione p : allPossibleMoves) {
+            if (p.getX() < 0 || p.getX() >= MAX || p.getY() < 0 || p.getY() >= MAX)
+                allPossibleMoves.remove(p);
+        }
         
         return allPossibleMoves;
     }
