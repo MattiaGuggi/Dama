@@ -165,7 +165,7 @@ public class Server {
         System.out.println("Mosse possibili"+allPossibleMoves);
         // Reverso coordinate
         for (Posizione pos : allPossibleMoves) {
-            //Se il nero mi ha mandando al richiesta, reverso le coordinate
+            //Se il nero mi ha mandando la richiesta, reverso le coordinate
             if(color == "black"){
                 msg += (game.getMax() - 1 -pos.getX()) + "," + (game.getMax() - 1 -pos.getY()) + ";";
             }

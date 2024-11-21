@@ -25,6 +25,10 @@ public class Pedina {
         return this.posizione;
     }
 
+    public void setIsDama() {
+        this.isDama = true;
+    }
+
     public void setPosition(Posizione posizione) {
         this.posizione = posizione;
     }
@@ -39,27 +43,44 @@ public class Pedina {
         int y = posizione.getY();
         ArrayList<Posizione> allPossibleMoves = new ArrayList<>();
 
-        // Se é libera puoi muovere
-        // Puó andare solo in avanti quindi controllo solo sulle righe successive
-        // Parte dal basso, dove le righe partono da 7 a salire (non da 0)
-        // Per provare, si puó muovere solo pedine in basso
-        if (this.color.equals("white")) {
+        // null indica casella libera
+        // Se non é null deve esserci una Pedina
+        // Per mangiare deve ovviamente essere di colore diverso
+        // Se é dama puó muoversi ovunque
+        // !!BISOGNA CONTROLLARE CHE NON ESCA DALLA BOARD ANCHE LA MANGIATA!!
+        if (this.color.equals("white") || this.isDama) {
+            // Spostamento
             if (y > 0 && x < MAX-1 && board[y-1][x+1] == null) {
                 allPossibleMoves.add(new Posizione(x+1, y-1));
             }
             if (y > 0 && x > 0 && board[y-1][x-1] == null) {
                 allPossibleMoves.add(new Posizione(x-1, y-1));
             }
+            // Mangiata
+            if (y > 0 && x < MAX-1 && !board[y-1][x+1].getColor().equals(this.color)) {
+                allPossibleMoves.add(new Posizione(x+2, y-2));
+            }
+            if (y > 0 && x > 0 && !board[y-1][x-1].getColor().equals(this.color)) {
+                allPossibleMoves.add(new Posizione(x-2, y-2));
+            }
         }
-        else if (this.color.equals("black")) {
+        else if (this.color.equals("black") || this.isDama) {
+            // Spostamento
             if (y < MAX-1 && x < MAX-1 && board[y+1][x+1] == null) {
                 allPossibleMoves.add(new Posizione(x+1, y+1));
             }
             if (y < MAX-1 && x > 0 && board[y+1][x-1] == null) {
                 allPossibleMoves.add(new Posizione(x-1, y+1));
             }
+            // Mangiata
+            if (y < MAX-1 && x < MAX-1 && !board[y+1][x+1].getColor().equals(this.color)) {
+                allPossibleMoves.add(new Posizione(x+2, y+2));
+            }
+            if (y < MAX-1 && x > 0 && !board[y+1][x-1].getColor().equals(this.color)) {
+                allPossibleMoves.add(new Posizione(x-2, y+2));
+            }
         }
-
+        
         return allPossibleMoves;
     }
 
