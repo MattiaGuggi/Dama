@@ -125,7 +125,13 @@ public class Server {
         board[endY][endX] = new Pedina(endX, endY, color); // Crea nuova pedina
         board[startY][startX] = null; // Rimuove la pedina dalla posizione precedente
 
-
+        // Controlla se mettere nuova pedina dama
+        if (color.equals("white") && endY == 0) {
+            board[endY][endX].setIsDama();
+        }
+        if (color.equals("black") && endY == game.getMax()-1) {
+            board[endY][endX].setIsDama();
+        }
 
         System.out.println("Scacchiera aggiornata lato server (unica):");
         for (int i=0 ; i<8 ; i++) {

@@ -49,41 +49,37 @@ public class Pedina {
         // Se é dama puó muoversi ovunque
         // !!BISOGNA CONTROLLARE CHE NON ESCA DALLA BOARD ANCHE LA MANGIATA!!
         if (this.color.equals("white") || this.isDama) {
-            // Spostamento
             if (y > 0 && x < MAX-1 && board[y-1][x+1] == null) {
                 allPossibleMoves.add(new Posizione(x+1, y-1));
+            }
+            else if (y > 0 && x < MAX-1 && !board[y-1][x+1].getColor().equals(this.color)) {
+                allPossibleMoves.add(new Posizione(x+2, y-2));
             }
             if (y > 0 && x > 0 && board[y-1][x-1] == null) {
                 allPossibleMoves.add(new Posizione(x-1, y-1));
             }
-            // Mangiata
-            if (y > 0 && x < MAX-1 && !board[y-1][x+1].getColor().equals(this.color)) {
-                allPossibleMoves.add(new Posizione(x+2, y-2));
-            }
-            if (y > 0 && x > 0 && !board[y-1][x-1].getColor().equals(this.color)) {
+            else if (y > 0 && x > 0 && !board[y-1][x-1].getColor().equals(this.color)) {
                 allPossibleMoves.add(new Posizione(x-2, y-2));
             }
         }
         else if (this.color.equals("black") || this.isDama) {
-            // Spostamento
             if (y < MAX-1 && x < MAX-1 && board[y+1][x+1] == null) {
                 allPossibleMoves.add(new Posizione(x+1, y+1));
+            }
+            else if (y < MAX-1 && x < MAX-1 && !board[y+1][x+1].getColor().equals(this.color)) {
+                allPossibleMoves.add(new Posizione(x+2, y+2));
             }
             if (y < MAX-1 && x > 0 && board[y+1][x-1] == null) {
                 allPossibleMoves.add(new Posizione(x-1, y+1));
             }
-            // Mangiata
-            if (y < MAX-1 && x < MAX-1 && !board[y+1][x+1].getColor().equals(this.color)) {
-                allPossibleMoves.add(new Posizione(x+2, y+2));
-            }
-            if (y < MAX-1 && x > 0 && !board[y+1][x-1].getColor().equals(this.color)) {
+            else if (y < MAX-1 && x > 0 && !board[y+1][x-1].getColor().equals(this.color)) {
                 allPossibleMoves.add(new Posizione(x-2, y+2));
-            }
+            } 
         }
 
         // Controlla che le posizioni siano tutte dentro la board
         for (Posizione p : allPossibleMoves) {
-            if (p.getX() < 0 || p.getX() >= MAX || p.getY() < 0 || p.getY() >= MAX)
+            if (p.getX() < 0 || p.getX() > MAX-1 || p.getY() < 0 || p.getY() > MAX-1)
                 allPossibleMoves.remove(p);
         }
 

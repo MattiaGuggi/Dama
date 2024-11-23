@@ -146,7 +146,7 @@ public class Campo {
         PedinaGrafica newPiece = new PedinaGrafica(new Posizione(col, row));
         newPiece.setColor(piece.getColor());
         newPiece.setOpacity(1.0f);
-    
+        
         // Rimuovi la vecchia pedina dall'ArrayList
         allPedineGrafiche.remove(piece);
     
@@ -176,15 +176,21 @@ public class Campo {
         // Aggiungi la nuova pedina all'ArrayList
         allPedineGrafiche.add(newPiece);
     
+        // Aggiorna logicamente la scacchiera
+        this.board[oldRow][oldCol] = null;
+        this.board[row][col] = new Pedina(col, row, piece.getColor().equals(Color.DARK_GRAY) ? "black" : "white");
+
+        // Mettere nuova pedina Dama se é della prima riga
+        if (row == 0) {
+            this.board[row][col].setIsDama();
+            newPiece.setIsDama();
+        }
+
         // Aggiungi la nuova pedina alla cella di destinazione
         cells[row][col].setLayout(new BorderLayout());
         cells[row][col].add(newPiece, BorderLayout.CENTER);
         cells[row][col].revalidate();
         cells[row][col].repaint();
-    
-        // Aggiorna logicamente la scacchiera
-        this.board[oldRow][oldCol] = null;
-        this.board[row][col] = new Pedina(col, row, piece.getColor().equals(Color.DARK_GRAY) ? "black" : "white");
 
         System.out.println("Campo attuale in Campo:");
         for (int i=0 ; i<8 ; i++) {
