@@ -48,11 +48,11 @@ public class ClientHandler extends Thread {
 
                             break;
                         case "pieceMoved":
-                            if (words.length > 0 )
+                            if (words.length > 1)
                                 this.handlePieceMoved(words);
                             break;
                         case "updateBoard":
-                            if (words.length > 0 )
+                            if (words.length > 0)
                                 this.handleUpdateBoard(words);
                             break;
                         case "mangiata":
