@@ -212,7 +212,7 @@ public class Campo {
         // Comunica il movimento al server
         if(callServer)
             out.println("movePiece#" + oldCol + "," + oldRow + "#" + col + "," + row);
-    }    
+    }
 
     //Mostra graficamente i posti in cui puoi muoverti
     public void showSquares(int x, int y){
@@ -232,6 +232,15 @@ public class Campo {
             cells[square.getY()][square.getX()].revalidate();
             cells[square.getY()][square.getX()].repaint(); 
         }
+    }
+
+    public void removePedina(PedinaGrafica piece) {
+        System.out.println("Bisogna rimuovere una pedina perché é stata mangiata!");
+        allPedineGrafiche.remove(piece); // Aggiorno ArrayList
+        board[piece.getPosition().getY()][piece.getPosition().getX()] = null; // Aggiorno board
+        cells[piece.getPosition().getY()][piece.getPosition().getX()].remove(piece);
+        cells[piece.getPosition().getY()][piece.getPosition().getX()].revalidate();
+        cells[piece.getPosition().getY()][piece.getPosition().getX()].repaint(); 
     }
     
     public void changeTurn() {

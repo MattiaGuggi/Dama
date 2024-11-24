@@ -92,7 +92,7 @@ public class Server {
                     
                     switch(words[0]) {
                         case "movePiece":
-                                manageMovePiece(words,you,other,turn);
+                                manageMovePiece(words,you,other,turn,playerColor);
                             break;
                         case "showPossibleMoves":
                                 manageShowPossibleMoves(words,you,playerColor);
@@ -111,7 +111,7 @@ public class Server {
         }
     }
 
-    static public void manageMovePiece(String[] messageFromClient,PrintWriter you,PrintWriter other,int turn){
+    static public void manageMovePiece(String[] messageFromClient,PrintWriter you,PrintWriter other,int turn,String pColor){
         Posizione startPosition = getPositionFromString(messageFromClient[1]);
         Posizione endPosition = getPositionFromString(messageFromClient[2]);
 
@@ -144,8 +144,6 @@ public class Server {
             System.out.println("");
         }
 
-        // Da controllare cosa succese alla board
-
         // Cambia turno
         game.changeTurn();
         // Notifica l'altro client di spostare anche nella sua board
@@ -154,7 +152,17 @@ public class Server {
 
         // Cosa succede alla board
         // Da controllare le mangiate e le possibili doppie mangiate (potrebbe poter muovere ancora)
+        // Come si capisce cosa é successo?
+        // Formato: pieceMoved#cosaSuccesso#posizione
+        /* String msg = "";
+        if (pColor.equals("black"))
+            msg = (game.getMax() - 1 -endPosition.getX()) + "," + (game.getMax() - 1 -endPosition.getY()) + ";";
+        else
+            msg = endPosition.getX() + "," + endPosition.getY() + ";";
+        you.println("pieceMoved#mangiata#" + msg); */
         you.println("pieceMoved#");
+        // Bisogna comunicare anche l'altro client cosa succede (magari lo fa l'altro client?magari si concatena ad updateBoard?)
+        other.println();
     }
 
 
@@ -173,7 +181,7 @@ public class Server {
         // Reverso coordinate
         for (Posizione pos : allPossibleMoves) {
             //Se il nero mi ha mandando la richiesta, reverso le coordinate
-            if(color == "black"){
+            if(color.equals("black")){
                 msg += (game.getMax() - 1 -pos.getX()) + "," + (game.getMax() - 1 -pos.getY()) + ";";
             }
             else

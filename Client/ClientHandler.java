@@ -4,6 +4,7 @@ import java.net.*;
 import java.io.*;
 import Server.Pedina;
 import Server.Posizione;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -47,6 +48,8 @@ public class ClientHandler extends Thread {
 
                             break;
                         case "pieceMoved":
+                            if (words.length > 0 )
+                                this.handlePieceMoved(words);
                             break;
                         case "updateBoard":
                             if (words.length > 0 )
@@ -144,6 +147,21 @@ public class ClientHandler extends Thread {
         // Non sposta la pedina ma mette solo a null nel campo dell' avversario
         campo.movePiece(startY, startX, endY, endX, false);
     }
+
+    public void handlePieceMoved(String[] words) {
+        Posizione pos = getPositionFromString(words[2]);
+        PedinaGrafica piece = this.campo.getPedinaFromPosition(pos);
+
+        switch(words[1]) {
+            case "mangiata":
+                this.campo.removePedina(piece);
+                break;
+            default:
+                System.out.println("Comando non riconosciuto!");
+                break;
+        }
+    }
+
     //Ritorna la posizone a partire da una stringa
     public Posizione getPositionFromString(String message){
         String coppiaDati = message;
