@@ -103,7 +103,6 @@ public class ClientHandler extends Thread {
         this.campo.setColor(messageSplitted[2]);
 
         this.campo.drawBoard();
-
     }
 
     public void handlePossibleMoves(String words) {
@@ -149,12 +148,23 @@ public class ClientHandler extends Thread {
     }
 
     public void handlePieceMoved(String[] words) {
-        Posizione pos = getPositionFromString(words[2]);
+        Posizione startPosition = getPositionFromString(words[2]);
+        Posizione endPosition = getPositionFromString(words[3]);
+        Posizione pos = new Posizione(0, 0);
+        if (Math.abs(endPosition.getX() - startPosition.getX()) > 1) {
+            pos.setX((startPosition.getX() + endPosition.getX()) / 2);
+            pos.setY((startPosition.getY() + endPosition.getY()) / 2);
+        }
+        System.out.println("Posizione calcolata: " + pos);
         PedinaGrafica piece = this.campo.getPedinaFromPosition(pos);
 
         switch(words[1]) {
             case "mangiata":
-                this.campo.removePedina(piece);
+                if (piece != null) {
+                    this.campo.removePedina(piece);
+                }
+                break;
+            case "normale":
                 break;
             default:
                 System.out.println("Comando non riconosciuto!");

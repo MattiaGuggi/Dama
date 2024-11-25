@@ -60,6 +60,7 @@ public class Campo {
                                 //Se quando clicco non è il mio turno, non faccio niente
                                 if(!isMyTurn())
                                     return;
+                                removeSquares();
                                 setPedinaCliccata(piece);
                                 System.out.println("Nuova pedina selezionata: " + piece);
 
@@ -235,12 +236,12 @@ public class Campo {
     }
 
     public void removePedina(PedinaGrafica piece) {
-        System.out.println("Bisogna rimuovere una pedina perché é stata mangiata!");
+        System.out.println("Pedina mangiata, " + piece);
         allPedineGrafiche.remove(piece); // Aggiorno ArrayList
         board[piece.getPosition().getY()][piece.getPosition().getX()] = null; // Aggiorno board
         cells[piece.getPosition().getY()][piece.getPosition().getX()].remove(piece);
         cells[piece.getPosition().getY()][piece.getPosition().getX()].revalidate();
-        cells[piece.getPosition().getY()][piece.getPosition().getX()].repaint(); 
+        cells[piece.getPosition().getY()][piece.getPosition().getX()].repaint();
     }
     
     public void changeTurn() {

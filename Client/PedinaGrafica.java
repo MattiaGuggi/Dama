@@ -43,6 +43,10 @@ class PedinaGrafica extends JComponent {
         this.isDama = true;
     }
 
+    public Boolean getIsDama() {
+        return this.isDama;
+    }
+
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);

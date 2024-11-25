@@ -38,55 +38,58 @@ public class Pedina {
     }
 
     // Devo ritornare tutte le posizioni in cui puó andare la pedina cliccata
-    public ArrayList<Posizione> getPossibleMoves(Pedina[][] board) {
+    public ArrayList<Mossa> getPossibleMoves(Pedina[][] board) {
         int x = posizione.getX();
         int y = posizione.getY();
-        ArrayList<Posizione> allPossibleMoves = new ArrayList<>();
-
-        // null indica casella libera
-        // Se non é null deve esserci una Pedina
-        // Per mangiare deve ovviamente essere di colore diverso
-        // Se é dama puó muoversi ovunque
-        // !!BISOGNA CONTROLLARE CHE NON ESCA DALLA BOARD ANCHE LA MANGIATA!!
+        ArrayList<Mossa> allPossibleMoves = new ArrayList<>();
+    
+        // null indicate cella vuota
+        // Per mangiare deve essere di colore diverso
         if (this.color.equals("white") || this.isDama) {
             if (y > 0 && x < MAX-1 && board[y-1][x+1] == null) {
-                allPossibleMoves.add(new Posizione(x+1, y-1));
+                allPossibleMoves.add(new Mossa(new Posizione(x+1, y-1), false));
             }
-            else if (y > 0 && x < MAX-1 && !board[y-1][x+1].getColor().equals(this.color)) {
-                allPossibleMoves.add(new Posizione(x+2, y-2));
+            else if (y > 1 && x < MAX-2 && board[y-1][x+1] != null 
+                       && !board[y-1][x+1].getColor().equals(this.color) 
+                       && board[y-2][x+2] == null) {
+                allPossibleMoves.add(new Mossa(new Posizione(x+2, y-2), true));
             }
             if (y > 0 && x > 0 && board[y-1][x-1] == null) {
-                allPossibleMoves.add(new Posizione(x-1, y-1));
+                allPossibleMoves.add(new Mossa(new Posizione(x-1, y-1), false));
             }
-            else if (y > 0 && x > 0 && !board[y-1][x-1].getColor().equals(this.color)) {
-                allPossibleMoves.add(new Posizione(x-2, y-2));
+            else if (y > 1 && x > 1 && board[y-1][x-1] != null 
+                       && !board[y-1][x-1].getColor().equals(this.color) 
+                       && board[y-2][x-2] == null) {
+                allPossibleMoves.add(new Mossa(new Posizione(x-2, y-2), true));
             }
-        }
-        else if (this.color.equals("black") || this.isDama) {
+        } 
+        if (this.color.equals("black") || this.isDama) {
             if (y < MAX-1 && x < MAX-1 && board[y+1][x+1] == null) {
-                allPossibleMoves.add(new Posizione(x+1, y+1));
+                allPossibleMoves.add(new Mossa(new Posizione(x+1, y+1), false));
             }
-            else if (y < MAX-1 && x < MAX-1 && !board[y+1][x+1].getColor().equals(this.color)) {
-                allPossibleMoves.add(new Posizione(x+2, y+2));
+            else if (y < MAX-2 && x < MAX-2 && board[y+1][x+1] != null 
+                       && !board[y+1][x+1].getColor().equals(this.color) 
+                       && board[y+2][x+2] == null) {
+                allPossibleMoves.add(new Mossa(new Posizione(x+2, y+2), true));
             }
             if (y < MAX-1 && x > 0 && board[y+1][x-1] == null) {
-                allPossibleMoves.add(new Posizione(x-1, y+1));
+                allPossibleMoves.add(new Mossa(new Posizione(x-1, y+1), false));
             }
-            else if (y < MAX-1 && x > 0 && !board[y+1][x-1].getColor().equals(this.color)) {
-                allPossibleMoves.add(new Posizione(x-2, y+2));
-            } 
+            else if (y < MAX-2 && x > 1 && board[y+1][x-1] != null 
+                       && !board[y+1][x-1].getColor().equals(this.color) 
+                       && board[y+2][x-2] == null) {
+                allPossibleMoves.add(new Mossa(new Posizione(x-2, y+2), true));
+            }
         }
-
-        // Controlla che le posizioni siano tutte dentro la board
-        for (Posizione p : allPossibleMoves) {
-            if (p.getX() < 0 || p.getX() > MAX-1 || p.getY() < 0 || p.getY() > MAX-1)
-                allPossibleMoves.remove(p);
-        }
-
-        // In qualche modo va comunicato che é una mossa per mangiare
-        
+    
+        // Rimuovi mosse al di fuori della board
+        allPossibleMoves.removeIf(move -> {
+            Posizione p = move.getTargetPosition();
+            return p.getX() < 0 || p.getX() >= MAX || p.getY() < 0 || p.getY() >= MAX;
+        });
+    
         return allPossibleMoves;
-    }
+    }    
 
     @Override
     public String toString() {

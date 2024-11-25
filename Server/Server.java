@@ -12,6 +12,7 @@ public class Server {
     private static Socket newSocket = null;
     private static Game game = null;
     private static Pedina[][] board = null;
+    private static ArrayList<Mossa> currentPossibleMoves = new ArrayList<>();
 
     public static void main(String[] args) {
         try{
@@ -120,7 +121,6 @@ public class Server {
         int endX = endPosition.getX();
         int endY = endPosition.getY();
 
-        // !!Da aggiornare correttamente!!
         String color = board[startY][startX].getColor();
         board[endY][endX] = new Pedina(endX, endY, color); // Crea nuova pedina
         board[startY][startX] = null; // Rimuove la pedina dalla posizione precedente
@@ -152,19 +152,32 @@ public class Server {
 
         // Cosa succede alla board
         // Da controllare le mangiate e le possibili doppie mangiate (potrebbe poter muovere ancora)
-        // Come si capisce cosa é successo?
-        // Formato: pieceMoved#cosaSuccesso#posizione
-        /* String msg = "";
-        if (pColor.equals("black"))
-            msg = (game.getMax() - 1 -endPosition.getX()) + "," + (game.getMax() - 1 -endPosition.getY()) + ";";
-        else
-            msg = endPosition.getX() + "," + endPosition.getY() + ";";
-        you.println("pieceMoved#mangiata#" + msg); */
-        you.println("pieceMoved#");
-        // Bisogna comunicare anche l'altro client cosa succede (magari lo fa l'altro client?magari si concatena ad updateBoard?)
-        other.println();
-    }
+        // Formato: pieceMoved#cause#start#end
 
+        String consequence = "";
+        for (Mossa move : currentPossibleMoves) {
+            if (move.isEatingMove())
+                consequence = "mangiata";
+            else
+                consequence = "normale";
+        }
+
+        String msgReverse = (game.getMax() - 1 - startPosition.getX()) + "," + (game.getMax() - 1 - startPosition.getY());
+        String msg = startPosition.getX() + "," + startPosition.getY();
+
+        String msgReverse2 = (game.getMax() - 1 - endPosition.getX()) + "," + (game.getMax() - 1 - endPosition.getY());
+        String msg2 = endPosition.getX() + "," + endPosition.getY();
+        
+        // Bisogna comunicare anche l'altro client cosa succede
+        if (pColor.equals("black")) {
+            you.println("pieceMoved#" + consequence + "#" + msgReverse + "#" + msgReverse2);
+            other.println("pieceMoved#" + consequence + "#" + msg + "#" + msg2);
+        }
+        else if (pColor.equals("white")){
+            you.println("pieceMoved#" + consequence + "#" + msg + "#" + msg2);
+            other.println("pieceMoved#" + consequence + "#" + msgReverse + "#" + msgReverse2);
+        }
+    }
 
     static public void manageShowPossibleMoves(String[] messageFromClient, PrintWriter out, String color){
         Posizione posizione = getPositionFromString(messageFromClient[1]);
@@ -174,15 +187,19 @@ public class Server {
 
         String msg = "";
 
+        currentPossibleMoves.clear();
         // Controllare se dobbiam ore
-        ArrayList<Posizione> allPossibleMoves = board[y][x].getPossibleMoves(board); // Cerchiamo mosse possibili
+        ArrayList<Mossa> allPossibleMoves = board[y][x].getPossibleMoves(board); // Cerchiamo mosse possibili
+
+        currentPossibleMoves.addAll(allPossibleMoves);
 
         System.out.println("Mosse possibili"+allPossibleMoves);
         // Reverso coordinate
-        for (Posizione pos : allPossibleMoves) {
+        for (Mossa move : allPossibleMoves) {
+            Posizione pos = move.getTargetPosition();
             //Se il nero mi ha mandando la richiesta, reverso le coordinate
             if(color.equals("black")){
-                msg += (game.getMax() - 1 -pos.getX()) + "," + (game.getMax() - 1 -pos.getY()) + ";";
+                msg += (game.getMax() - 1 - pos.getX()) + "," + (game.getMax() - 1 - pos.getY()) + ";";
             }
             else
                 msg += pos.getX() + "," + pos.getY() + ";";
