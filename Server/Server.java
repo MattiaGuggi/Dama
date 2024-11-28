@@ -12,7 +12,6 @@ public class Server {
     private static Socket newSocket = null;
     private static Game game = null;
     private static Pedina[][] board = null;
-    private static ArrayList<Mossa> currentPossibleMoves = new ArrayList<>();
 
     public static void main(String[] args) {
         try{
@@ -66,6 +65,8 @@ public class Server {
             out.println("createGame#" + board1.toString() + "#black");
             out1.println("createGame#" + board2.toString() + "#white");
 
+
+
             //Adesso ho i due giocatori
             //Posso iniziare la partita
             Boolean endGame = false;
@@ -112,26 +113,45 @@ public class Server {
         }
     }
 
+    //MessageFromClient conterrà la path che il pezzo ha seguito nel muoversi
     static public void manageMovePiece(String[] messageFromClient,PrintWriter you,PrintWriter other,int turn,String pColor){
-        Posizione startPosition = getPositionFromString(messageFromClient[1]);
-        Posizione endPosition = getPositionFromString(messageFromClient[2]);
 
-        int startX = startPosition.getX();
-        int startY = startPosition.getY();
-        int endX = endPosition.getX();
-        int endY = endPosition.getY();
 
-        String color = board[startY][startX].getColor();
-        board[endY][endX] = new Pedina(endX, endY, color); // Crea nuova pedina
-        board[startY][startX] = null; // Rimuove la pedina dalla posizione precedente
+        String msg = messageFromClient[1];
+        System.out.println("Msg: "+msg);
+        //Ricavo il percorso che la mia pedina deve seguire
+        ArrayList<Node> path = Node.convertStringToArray(msg,game.getTurn() == 0,game.getMax());
 
-        // Controlla se mettere nuova pedina dama
-        if (color.equals("white") && endY == 0) {
-            board[endY][endX].setIsDama();
+        Node firstElement = path.get(0);
+        Node lastElement  = path.get(path.size()-1);
+
+        String color = board[firstElement.y][firstElement.x].getColor();
+        Boolean wasDama = board[firstElement.y][firstElement.x].getIsDama();
+        board[lastElement.y][lastElement.x] = new Pedina(lastElement.x,lastElement.y,color);
+        board[firstElement.y][firstElement.x] = null; // Rimuove la pedina dalla posizione precedente
+
+
+        //Controllo se la mia mossa ha causato mangiate
+        for(int i = 1;i<path.size();i++){
+            if(path.get(i).pieceEaten != null){
+                System.out.println("Pedina da eliminare!!::"+path.get(i).pieceEaten);
+                //Ricorda di reversare le coordinate
+                int x = path.get(i).pieceEaten.getPosizione().getX();
+                int y = path.get(i).pieceEaten.getPosizione().getY();
+
+                //Tolgo i pezzi dalla matrice
+                board[y][x] = null;
+            }
         }
-        if (color.equals("black") && endY == game.getMax()-1) {
-            board[endY][endX].setIsDama();
+
+        //Controllo se qualcuno è diventato una dama
+        if (color.equals("white") && lastElement.y == 0 || wasDama) {
+            board[lastElement.y][lastElement.x].setIsDama();
         }
+        if (color.equals("black") && lastElement.y == game.getMax() - 1 || wasDama) {
+            board[lastElement.y][lastElement.x].setIsDama();
+        }
+
 
         System.out.println("Scacchiera aggiornata lato server (unica):");
         for (int i=0 ; i<8 ; i++) {
@@ -139,7 +159,7 @@ public class Server {
                 if (board[i][j] == null)
                     System.out.print("---- ");
                 else
-                    System.out.print(board[i][j] + " ");
+                    System.out.print(board[i][j] + " "+board[i][j].getIsDama());
             }
             System.out.println("");
         }
@@ -148,35 +168,8 @@ public class Server {
         game.changeTurn();
         // Notifica l'altro client di spostare anche nella sua board
         //L'altro è sempre reversato rispetto a te
-        other.println("updateBoard#" + startPosition + "#" + endPosition);
+        other.println("updateBoard#" + msg);
 
-        // Cosa succede alla board
-        // Da controllare le mangiate e le possibili doppie mangiate (potrebbe poter muovere ancora)
-        // Formato: pieceMoved#cause#start#end
-
-        String consequence = "";
-        for (Mossa move : currentPossibleMoves) {
-            if (move.isEatingMove())
-                consequence = "mangiata";
-            else
-                consequence = "normale";
-        }
-
-        String msgReverse = (game.getMax() - 1 - startPosition.getX()) + "," + (game.getMax() - 1 - startPosition.getY());
-        String msg = startPosition.getX() + "," + startPosition.getY();
-
-        String msgReverse2 = (game.getMax() - 1 - endPosition.getX()) + "," + (game.getMax() - 1 - endPosition.getY());
-        String msg2 = endPosition.getX() + "," + endPosition.getY();
-        
-        // Bisogna comunicare anche l'altro client cosa succede
-        if (pColor.equals("black")) {
-            you.println("pieceMoved#" + consequence + "#" + msgReverse + "#" + msgReverse2);
-            other.println("pieceMoved#" + consequence + "#" + msg + "#" + msg2);
-        }
-        else if (pColor.equals("white")){
-            you.println("pieceMoved#" + consequence + "#" + msg + "#" + msg2);
-            other.println("pieceMoved#" + consequence + "#" + msgReverse + "#" + msgReverse2);
-        }
     }
 
     static public void manageShowPossibleMoves(String[] messageFromClient, PrintWriter out, String color){
@@ -185,36 +178,57 @@ public class Server {
         int y = posizione.getY();
         int x = posizione.getX();
 
-        String msg = "";
-
-        currentPossibleMoves.clear();
         // Controllare se dobbiam ore
-        ArrayList<Mossa> allPossibleMoves = board[y][x].getPossibleMoves(board); // Cerchiamo mosse possibili
+        Node allPossibleMoves = board[y][x].getPossibleMoves(board); // Cerchiamo mosse possibili
 
-        currentPossibleMoves.addAll(allPossibleMoves);
 
-        System.out.println("Mosse possibili"+allPossibleMoves);
-        // Reverso coordinate
-        for (Mossa move : allPossibleMoves) {
-            Posizione pos = move.getTargetPosition();
-            //Se il nero mi ha mandando la richiesta, reverso le coordinate
-            if(color.equals("black")){
-                msg += (game.getMax() - 1 - pos.getX()) + "," + (game.getMax() - 1 - pos.getY()) + ";";
-            }
-            else
-                msg += pos.getX() + "," + pos.getY() + ";";
-        }
+        String msg1 = Node.convertTreeToString2(allPossibleMoves);
+        System.out.println("MSG1:" + msg1);
 
+        System.out.println("Calcolo il msg2.....");
+
+        String msg2 = Node.convertTreeToString2(Node.convertStringToTree(Node.convertTreeToString(allPossibleMoves)));
+
+        System.out.println("MSG2:" + msg2);
+
+
+        //Se è una pedina nera, devo reversare le coordinate
+        if(color.equals("black"))
+            reverseCoordinates(allPossibleMoves,game);
+        
+        //Ora che ho le coordinate reversate, devo convertire il messaggio in stringa così che il client puo riceverlo
+        String msg = Node.convertTreeToString(allPossibleMoves);
+        
         if (msg.length() > 0) {
-            msg = msg.substring(0, msg.length() - 1);
             out.println("showPossibleMoves#" + msg);
         }
     }
+    
+    static public void reverseCoordinates(Node root,Game game){
+        
+        if(root != null){
+            //Inverto le coordinate
+            root.x =  game.getMax() - 1 - root.x;
+            root.y = game.getMax() - 1 - root.y;
+
+            if(root.pieceEaten != null){
+                root.pieceEaten.getPosizione().setX(game.getMax() - 1 - root.pieceEaten.getPosizione().getX());
+                root.pieceEaten.getPosizione().setY(game.getMax() - 1 - root.pieceEaten.getPosizione().getY());
+            }
+
+            reverseCoordinates(root.dl, game);
+            reverseCoordinates(root.dr, game);
+            reverseCoordinates(root.ul, game);
+            reverseCoordinates(root.ur, game);
+            
+        }
+    }
+
 
     //Ritorna la posizone a partire da una stringa
     static public Posizione getPositionFromString(String message){
         String coppiaDati = message;
-        String[] split = coppiaDati.split(",");
+        String[] split = coppiaDati.split("-");
         int x = Integer.parseInt(split[0]);
         int y = Integer.parseInt(split[1]);
         if (game.getTurn() == 0) {

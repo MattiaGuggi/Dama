@@ -8,6 +8,7 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import Server.Pedina;
 import Server.Posizione;
+import Server.Node;
 
 public class Campo {
     private final int MAX = 8;
@@ -50,7 +51,7 @@ public class Campo {
                 
                 // Se c'é una pedina
                 if (board[i][j] != null) {
-                    PedinaGrafica piece = new PedinaGrafica(new Posizione(j, i));
+                    PedinaGrafica piece = new PedinaGrafica(new Posizione(j, i),false);
 
                     // Listener per click sulla pedina solo se del colore giusto
                     if (this.myColor.equals(board[i][j].getColor())) {
@@ -90,25 +91,40 @@ public class Campo {
                 cells[i][j].addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
-                        PedinaGrafica localPedinaCliccata = getPedinaCliccata();
-                        if(localPedinaCliccata == null || !isMyTurn())
-                            return;
-                        
-                        removeSquares();
-                        
-                        for (PedinaGrafica p : allPedineGrafiche) {
-                            p.setOpacity(1.0f);
-                        }
+                        new SwingWorker<Void,Void>() {
+                            protected Void doInBackground() throws Exception{
+                                PedinaGrafica localPedinaCliccata = getPedinaCliccata();
+                                if (localPedinaCliccata == null || !isMyTurn())
+                                    return null;
 
-                        Posizione oldPosition = localPedinaCliccata.getPosition();
-                        int oldRow = oldPosition.getY();
-                        int oldCol = oldPosition.getX();
+                                removeSquares();
 
-                        for (Posizione pos : localPedinaCliccata.getPawnPossibleMoves()) {
-                            if (pos.getX() == col && pos.getY() == row) {
-                                    movePiece(oldRow, oldCol, row, col,true);
+                                for (PedinaGrafica p : allPedineGrafiche) {
+                                    p.setOpacity(1.0f);
+                                }
+
+                                Node node = localPedinaCliccata.getPawnPossibleMoves();
+
+                                ArrayList<ArrayList<Node>> allPath = new ArrayList<ArrayList<Node>>();
+
+                                findAllPath(node, col, row, new ArrayList<Node>(), allPath);
+
+                                int max = -1;
+                                ArrayList<Node> pathChosen = new ArrayList<>();
+                                for (int i = 0; i < allPath.size(); ++i) {
+                                    if (allPath.size() > max) {
+                                        max = allPath.size();
+                                        pathChosen = allPath.get(i);
+                                    }
+                                }
+
+                                if (allPath.size() > 0)
+                                    movePiece(pathChosen, true);
+                                return null;
                             }
-                        }
+
+                        }.execute();
+                        
                     }
                 });
                 
@@ -118,9 +134,34 @@ public class Campo {
         }
 
         frame.pack();
-        frame.setResizable(true);
+        frame.setResizable(false);
         frame.setVisible(true);
     }
+
+
+    public void findAllPath(Node tree,int x,int y,ArrayList<Node> currentPath,ArrayList<ArrayList<Node>> allPath) {
+        //If tree is null
+        if(tree == null) 
+            return;
+    
+        // Crea una nuova copia del percorso corrente e aggiungi il nodo corrente
+
+        ArrayList<Node> newPath = new ArrayList<>(currentPath);
+        newPath.add(tree);
+
+
+        // Se il nodo corrente è il target, salva il percorso
+        if (tree.x == x && tree.y == y) {
+            allPath.add(newPath);
+        } else {
+            // Esplora tutte le direzioni disponibili
+            findAllPath(tree.dl, x,y, newPath, allPath);
+            findAllPath(tree.dr, x,y, newPath, allPath);
+            findAllPath(tree.ul, x,y, newPath, allPath);
+            findAllPath(tree.ur, x,y, newPath, allPath);
+        }
+    }
+
 
     public PedinaGrafica getPedinaFromPosition(Posizione position) {
         for (PedinaGrafica p : allPedineGrafiche) {
@@ -132,67 +173,104 @@ public class Campo {
         return null;
     }
 
-    public void movePiece(int oldRow, int oldCol, int row, int col,Boolean callServer) {
-        //Quando clicco 
+    //Muove un pezzo nel campo, seguendo un movimento
+    public void movePiece(ArrayList<Node> pathChosen,Boolean callServer) {
+
+        // Comunica il movimento al server
+        if (callServer)
+            out.println("movePiece#" + pathChosen);
+
+        //Di base quando clicco rimuovo gli altri suggerimenti presenti nel campo
         this.removeSquares();
-        // Bisogna capire se é chiamato per spostare propria pedina o dell' avversario
-        PedinaGrafica piece = getPedinaFromPosition(new Posizione(oldCol, oldRow));
-    
-        // Rimuovi pedina dalla cella precedente
-        cells[oldRow][oldCol].remove(piece);
-        cells[oldRow][oldCol].revalidate();
-        cells[oldRow][oldCol].repaint();
-    
-        // Crea una nuova pedina grafica per la posizione di destinazione
-        PedinaGrafica newPiece = new PedinaGrafica(new Posizione(col, row));
-        newPiece.setColor(piece.getColor());
-        newPiece.setOpacity(1.0f);
+
+        //Il primo elemento nel mio vettore, è la pedina di partenza
+
+        Node startPiece = pathChosen.get(0);
+
+
+        //Ora devo ricavare la pedina grafica da muovere
+
+        PedinaGrafica piece = getPedinaFromPosition(new Posizione(startPiece.x, startPiece.y));
+        Boolean wasDama = piece.getIsDama();
         
-        // Rimuovi la vecchia pedina dall'ArrayList
+        String normalColor = piece.getColor().equals(Color.DARK_GRAY) ? "black" : "white";
+        
+        // Rimuovi la pedina originale
+        cells[startPiece.y][startPiece.x].remove(piece);
+        cells[startPiece.y][startPiece.x].revalidate();
+        cells[startPiece.y][startPiece.x].repaint();
+
         allPedineGrafiche.remove(piece);
-    
-        // Aggiungi il listener alla nuova pedina
-        newPiece.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (!isMyTurn())
-                    return;
-                
-                setPedinaCliccata(newPiece);
+        //Ora faccio in modo di spostare il pezzo gradualmente 
+        try{
+            for(int i = 1;i<pathChosen.size()-1;++i){
+                System.out.println("Dentro il ciclo!!");
+                Node nodo = pathChosen.get(i);
 
-                System.out.println("Nuova pedina selezionata: " + newPiece);
 
-                for (PedinaGrafica p : allPedineGrafiche) {
-                    p.setOpacity(1.0f);
-                }
-    
-                newPiece.setOpacity(0.5f);
-    
-                if (newPiece != null) {
-                    out.println("showPossibleMoves#" + newPiece);
-                }
+                addPieceToBoard(nodo.x,nodo.y,piece.getColor(),normalColor, wasDama);
+
+                Thread.sleep(40);
+                //Dopo che lo aggiungo, rimuovo la pedina da mangiare
+                if(nodo.pieceEaten != null)
+                    removePedina(getPedinaFromPosition(new Posizione(nodo.pieceEaten.getPosizione().getX(), nodo.pieceEaten.getPosizione().getY())));
+                Thread.sleep(500);
+                //Ora rimuovo la pedina che avevo aggiunto
+
+                removePedina(getPedinaFromPosition(new Posizione(nodo.x, nodo.y)));
+
             }
-        });
-    
-        // Aggiungi la nuova pedina all'ArrayList
-        allPedineGrafiche.add(newPiece);
-    
-        // Aggiorna logicamente la scacchiera
-        this.board[oldRow][oldCol] = null;
-        this.board[row][col] = new Pedina(col, row, piece.getColor().equals(Color.DARK_GRAY) ? "black" : "white");
+            System.out.println("Fine animazioni");
+            //L'ultimo lo faccio fuori
+            Node nodo = pathChosen.get(pathChosen.size() - 1);
 
-        // Mettere nuova pedina Dama se é della prima riga
-        if (row == 0) {
-            this.board[row][col].setIsDama();
-            newPiece.setIsDama();
+            final PedinaGrafica lastPiece = addPieceToBoard(nodo.x, nodo.y, piece.getColor(),normalColor,wasDama);
+
+            System.out.println("lastPiece:"+lastPiece.getPosition().getX()+"--"+lastPiece.getPosition().getY());
+            Thread.sleep(50);
+            // Dopo che lo aggiungo, rimuovo la pedina da mangiare
+            if (nodo.pieceEaten != null){
+                System.out.println("Devi mangiare: "+nodo.pieceEaten);
+                removePedina(getPedinaFromPosition( new Posizione(nodo.pieceEaten.getPosizione().getX(), nodo.pieceEaten.getPosizione().getY())));
+            }
+            
+            // Aggiungi il listener alla ultima pedina creata
+            if (this.myColor.equals(normalColor)) {
+                lastPiece.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        if (!isMyTurn())
+                            return;
+                        
+                        setPedinaCliccata(lastPiece);
+                        System.out.println("Nuova pedina selezionata: " + lastPiece);
+
+                        for (PedinaGrafica p : allPedineGrafiche) {
+                            p.setOpacity(1.0f);
+                        }
+            
+                        lastPiece.setOpacity(0.5f);
+            
+                        if (lastPiece != null) {
+                            out.println("showPossibleMoves#" + lastPiece);
+                        }
+                    }
+                });
+            }
+            //Aggiungi la nuova pedina all'ArrayList
+            
+            
+            String color = piece.getColor().equals(Color.DARK_GRAY) ? "black" : "white";
+            // Aggiorna logicamente la scacchiera
+            this.board[startPiece.y][startPiece.x] = null;
+            this.board[lastPiece.getPosition().getY()][lastPiece.getPosition().getX()] = new Pedina(lastPiece
+                    .getPosition().getX(), lastPiece.getPosition().getY(),color);
+        
+
+        
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
-        // Aggiungi la nuova pedina alla cella di destinazione
-        cells[row][col].setLayout(new BorderLayout());
-        cells[row][col].add(newPiece, BorderLayout.CENTER);
-        cells[row][col].revalidate();
-        cells[row][col].repaint();
-
         System.out.println("Campo attuale in Campo:");
         for (int i=0 ; i<8 ; i++) {
             for (int j=0 ; j<8 ; j++) {
@@ -210,10 +288,43 @@ public class Campo {
         // Deseleziona la pedina cliccata
         setPedinaCliccata(null);
 
-        // Comunica il movimento al server
-        if(callServer)
-            out.println("movePiece#" + oldCol + "," + oldRow + "#" + col + "," + row);
     }
+
+
+    //Aggiunge una pedina alla checkerboard
+    private PedinaGrafica addPieceToBoard(int x,int y,Color color,String normalColor,Boolean wasDama){
+
+        Boolean dama = false;
+        // Devo capire se devo upgradare il pezzo
+        if (normalColor.equals(this.myColor) ) {
+            // Se a muoversi è stato un mio pezzo, viene upgradato quando raggiunge lo zero
+            if (y == 0)
+                dama = true;
+
+        } else if (y == MAX - 1) {
+            dama = true;
+        }
+
+        if(!dama)
+            dama = wasDama;
+
+
+
+        PedinaGrafica newPiece = new PedinaGrafica(new Posizione(x, y),dama);
+
+        allPedineGrafiche.add(newPiece);
+        newPiece.setColor(normalColor.equals("black") ? Color.DARK_GRAY : Color.LIGHT_GRAY);
+        newPiece.setOpacity(1.0f);
+
+        // Aggiungi la nuova pedina alla cella di destinazione
+        cells[y][x].setLayout(new BorderLayout());
+        cells[y][x].add(newPiece, BorderLayout.CENTER);
+        cells[y][x].revalidate();
+        cells[y][x].repaint();
+
+        return newPiece;
+    }
+
 
     //Mostra graficamente i posti in cui puoi muoverti
     public void showSquares(int x, int y){
@@ -237,11 +348,12 @@ public class Campo {
 
     public void removePedina(PedinaGrafica piece) {
         System.out.println("Pedina mangiata, " + piece);
-        allPedineGrafiche.remove(piece); // Aggiorno ArrayList
+        allPedineGrafiche.remove(piece); // Aggiorno ArrayList {
         board[piece.getPosition().getY()][piece.getPosition().getX()] = null; // Aggiorno board
         cells[piece.getPosition().getY()][piece.getPosition().getX()].remove(piece);
         cells[piece.getPosition().getY()][piece.getPosition().getX()].revalidate();
         cells[piece.getPosition().getY()][piece.getPosition().getX()].repaint();
+        System.out.println("Pedina eliminata!!!");
     }
     
     public void changeTurn() {

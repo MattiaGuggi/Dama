@@ -2,18 +2,19 @@ package Client;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
 
+import Server.Node;
 import Server.Posizione;
 
 class PedinaGrafica extends JComponent {
     private Color color;
     private Posizione posizione;
     private Boolean isDama = false;
-    private ArrayList<Posizione> allPossibleMoves = new ArrayList<>();
+    private Node allPossibleMoves;
 
-    public PedinaGrafica(Posizione posizione) {
+    public PedinaGrafica(Posizione posizione,Boolean dama) {
         this.posizione = posizione;
+        this.isDama = dama;
     }
 
     public void setOpacity(float opacity) {
@@ -52,13 +53,17 @@ class PedinaGrafica extends JComponent {
         super.paintComponent(g);
         g.setColor(color);
         g.fillOval(10, 10, getWidth() - 20, getHeight() - 20);
+        if(this.isDama){
+            g.setColor(Color.GREEN);
+            g.fillOval(20, 20, getWidth() - 40, getHeight() - 40);
+        }
     }
 
-    public void setPawnPossibleMoves(ArrayList<Posizione> allPossibleMoves) {
+    public void setPawnPossibleMoves(Node allPossibleMoves) {
         this.allPossibleMoves = allPossibleMoves;
     }
 
-    public ArrayList<Posizione> getPawnPossibleMoves() {
+    public Node getPawnPossibleMoves() {
         return this.allPossibleMoves;
     }
 

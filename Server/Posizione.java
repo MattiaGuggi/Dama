@@ -26,12 +26,12 @@ public class Posizione {
 
     @Override
     public String toString() {
-        return this.x+","+this.y;
+        return this.x+"-"+this.y;
     }
     //Potrebbe essere necessario reversare le coordinate
     public String getString(Boolean reverse){
         if(reverse)
-            return (MAX - x - 1) + "," + (MAX - y - 1);
-        return x + "," + y;
+            return (MAX - x - 1) + "-" + (MAX - y - 1);
+        return x + "-" + y;
     }
 }

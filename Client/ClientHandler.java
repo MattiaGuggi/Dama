@@ -1,12 +1,13 @@
 package Client;
 
 import java.net.*;
+import java.util.ArrayList;
 import java.io.*;
+
+import Server.Node;
 import Server.Pedina;
 import Server.Posizione;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 
 public class ClientHandler extends Thread {
     private Boolean partitaFinita = false;
@@ -32,7 +33,6 @@ public class ClientHandler extends Thread {
                 //Formato generale: NomeComando#Data1#Data2#Data3....
                 if (result != null) {
                     // Devo decodificare la stringa che ho appena ricevuto
-                    System.out.println("Result: " + result);
                 
                     String[] words = result.split("#");
 
@@ -46,10 +46,6 @@ public class ClientHandler extends Thread {
                             else
                                 System.out.println("Non ci sono mosse possibili");
 
-                            break;
-                        case "pieceMoved":
-                            if (words.length > 1)
-                                this.handlePieceMoved(words);
                             break;
                         case "updateBoard":
                             if (words.length > 0)
@@ -86,7 +82,7 @@ public class ClientHandler extends Thread {
 
         for (String pedinaStr : pedineData) {
             // Recupero valori passati dal server (posizione di ogni pedina)
-            String[] split = pedinaStr.split(",");
+            String[] split = pedinaStr.split("-");
             String colore = split[0];
             int x = Integer.parseInt(split[1]);
             int y = Integer.parseInt(split[2]);
@@ -105,85 +101,57 @@ public class ClientHandler extends Thread {
         this.campo.drawBoard();
     }
 
+    // Modifica
+    //words (x#y#null) (ul: (x#y#null) ur: (x#y#null) .... )
     public void handlePossibleMoves(String words) {
-        String[] coppiaDati = words.split(";");
-        PedinaGrafica piece = this.campo.getPedinaCliccata();
         
-        // Prendo tutte le posizioni possibili
-        ArrayList<Posizione> allPossibleMoves = new ArrayList<>();
-        //Rimuovo i possibili posti dove andare
+        Node tree = Node.convertStringToTree(words);
+        //La testa del tree corrisponde alla pedina stessa e va quindi tolta
         campo.removeSquares();
-        for (String coppia : coppiaDati) {
-            String[] coords = coppia.split(",");
-            if (coords.length == 2) {
-                int x = Integer.parseInt(coords[0]);
-                int y = Integer.parseInt(coords[1]);
-                Posizione pos = new Posizione(x, y);
-
-                allPossibleMoves.add(pos);
-    
-                System.out.println("Mosse possibili: " + pos);
-                campo.showSquares(x, y);
-            }
-        }
-
-        // Setto le nuove mosse possibili di una pedina
-        if (!allPossibleMoves.isEmpty()) {
-            piece.setPawnPossibleMoves(allPossibleMoves);
-        }
-    }
-
-    public void handleUpdateBoard(String[] words) {
-        System.out.println("DEVO UPDTAR LA FOWFDASDASDAS->"+Arrays.toString(words));
-        Posizione startPosition = getPositionFromString(words[1]);
-        Posizione endPosition = getPositionFromString(words[2]);
-
-        int startX = startPosition.getX();
-        int startY = startPosition.getY();
-        int endX = endPosition.getX();
-        int endY = endPosition.getY();
-
-        // Non sposta la pedina ma mette solo a null nel campo dell' avversario
-        campo.movePiece(startY, startX, endY, endX, false);
-    }
-
-    public void handlePieceMoved(String[] words) {
-        Posizione startPosition = getPositionFromString(words[2]);
-        Posizione endPosition = getPositionFromString(words[3]);
-        Posizione pos = new Posizione(0, 0);
-        if (Math.abs(endPosition.getX() - startPosition.getX()) > 1) {
-            pos.setX((startPosition.getX() + endPosition.getX()) / 2);
-            pos.setY((startPosition.getY() + endPosition.getY()) / 2);
-        }
-        System.out.println("Posizione calcolata: " + pos);
-        PedinaGrafica piece = this.campo.getPedinaFromPosition(pos);
-
-        switch(words[1]) {
-            case "mangiata":
-                if (piece != null) {
-                    this.campo.removePedina(piece);
-                }
-                break;
-            case "normale":
-                break;
-            default:
-                System.out.println("Comando non riconosciuto!");
-                break;
-        }
-    }
-
-    //Ritorna la posizone a partire da una stringa
-    public Posizione getPositionFromString(String message){
-        String coppiaDati = message;
-        String[] split = coppiaDati.split(",");
-        int x = Integer.parseInt(split[0]);
-        int y = Integer.parseInt(split[1]);
-
-        if(this.campo.getColor().equals("black")){
-            x = MAX - x - 1;
-            y = MAX - y - 1;
-        }
         
-        return new Posizione(x, y);
+        iterateTree(tree.dl);
+        iterateTree(tree.dr);
+        iterateTree(tree.ul);
+        iterateTree(tree.ur);
+
+
+        PedinaGrafica piece = this.campo.getPedinaCliccata();
+        // Setto le nuove mosse possibili di una pedina
+        if (tree.dl != null || tree.dr != null || tree.ul != null || tree.ur != null) {
+            piece.setPawnPossibleMoves(tree);
+        }
     }
+
+    public void iterateTree(Node tree){
+        if(tree != null){
+            int x = tree.x;
+            int y = tree.y;
+
+            iterateTree(tree.dl);
+            iterateTree(tree.dr);
+            iterateTree(tree.ul);
+            iterateTree(tree.ur);
+            campo.showSquares(x, y);
+        }
+    }
+
+    //words[1] contiene il path che la mia pedina deve seguire
+    //Dato che il percorso mi è stato inviato dall'altro client, devo sicuramente invertire le coordinate
+    //formato: [x;y;pieceEaten,x2;y2;pieceEaten2]
+    //La virgola divide gli elementi del vettore
+    //pieceEaten è nel formato: colorx-y 
+    public void handleUpdateBoard(String[] words) {
+        System.out.println("Messaggio ricevuto: "+words[1]);
+
+        String stringa = words[1];
+
+        ArrayList<Node> path = Node.convertStringToArray(stringa,true,MAX);
+
+        //In path adesso ho il percorso con le coordianate da seguire dalla pedina
+
+        campo.movePiece(path, false);
+
+    }
+
+    
 }
