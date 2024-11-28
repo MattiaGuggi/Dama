@@ -1,18 +1,26 @@
 package Client;
 
 import java.net.*;
-import java.util.ArrayList;
 import java.io.*;
-
+import java.util.ArrayList;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 import Server.Node;
 import Server.Pedina;
-import Server.Posizione;
 
 
 public class ClientHandler extends Thread {
     private Boolean partitaFinita = false;
     private final int MAX = 8;
     private Campo campo = null;
+    private JFrame frame = null;
+    private JButton button = new JButton("Search Game!");
+
+    public ClientHandler(JFrame frame) {
+        this.frame = frame;
+    }
 
     @Override
     public void run(){
@@ -26,6 +34,24 @@ public class ClientHandler extends Thread {
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
             PrintWriter out = new PrintWriter(socket.getOutputStream(),true);
+            
+            this.frame.setSize(640, 640);
+            this.frame.setLayout(null);
+
+            this.button.setBounds((640 - 300) / 2, (640 - 75) / 2, 300, 75);
+            this.frame.add(this.button);
+
+            this.button.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    out.println("searchGame");
+                    button.setEnabled(false);
+                    button.setText("Searching...");
+                }
+            });
+            
+            this.frame.setResizable(false);
+            this.frame.setVisible(true);
 
             while(!partitaFinita){
                 String result = in.readLine();
@@ -90,18 +116,20 @@ public class ClientHandler extends Thread {
             Pedina pedina = new Pedina(x, y, colore);
             board[y][x] = pedina;
         }
+        
+        // Togli il pulsante
+        this.frame.getContentPane().removeAll();
+        this.frame.repaint();
 
         // Crea un campo grafico basato sul campo su lato server
-        this.campo = new Campo(board, out);
+        this.campo = new Campo(board, out, this.frame);
         
         //Settiamo il nostro colore
         System.out.println("Il tuo colore + "+messageSplitted[2]);
         this.campo.setColor(messageSplitted[2]);
-
         this.campo.drawBoard();
     }
 
-    // Modifica
     //words (x#y#null) (ul: (x#y#null) ur: (x#y#null) .... )
     public void handlePossibleMoves(String words) {
         

@@ -59,18 +59,32 @@ public class Server {
             board = game.getBoard();
 
             String board1 = game.stringifyBoard(true);
-            String board2 = game.stringifyBoard(false);
-            
-            // Passo al client cosa fare e la matrice di Pedine in formato comando#matrice#turno
-            out.println("createGame#" + board1.toString() + "#black");
-            out1.println("createGame#" + board2.toString() + "#white");
+            String board2 = game.stringifyBoard(false);Boolean player1Ready = false, player2Ready = false, endGame = false;
 
+            // Wait for both players to indicate readiness
+            while (!player1Ready || !player2Ready) {
+                if (!player1Ready) {
+                    String result = in.readLine();
+                    if (result.equals("searchGame")) {
+                        player1Ready = true;
+                        System.out.println("Player 1 is ready!");
+                    }
+                }
 
+                if (!player2Ready) {
+                    String result = in1.readLine();
+                    if (result.equals("searchGame")) {
+                        player2Ready = true;
+                        System.out.println("Player 2 is ready!");
+                    }
+                }
+            }
+
+            out.println("createGame#" + board1 + "#black");
+            out1.println("createGame#" + board2 + "#white");
 
             //Adesso ho i due giocatori
             //Posso iniziare la partita
-            Boolean endGame = false;
-
             while(!endGame){
                 PrintWriter you = out;
                 PrintWriter other =out1;

@@ -1,9 +1,12 @@
 package Client;
 
-public class Client {
+import javax.swing.*;
 
+public class Client {
     public static void main(String[] args) {
-        ClientHandler c = new ClientHandler();
+        JFrame frame = new JFrame();
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        ClientHandler c = new ClientHandler(frame);
         c.start();
     }
 }

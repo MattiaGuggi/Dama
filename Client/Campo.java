@@ -17,24 +17,20 @@ public class Campo {
     private ArrayList<PedinaGrafica> allPedineGrafiche = new ArrayList<>();
     private PedinaGrafica pedinaCliccata = null; // Tiene traccia della pedina cliccata prima che deve essere spostata
     private PrintWriter out = null;
-
     private String myColor;
-
     private int turn = 1;
-
-    //Lista con tutti i posti consigliati possibili
-    private ArrayList<Square> squareList = new ArrayList<>();
+    private ArrayList<Square> squareList = new ArrayList<>(); // Lista con tutti i posti consigliati possibili
+    private JFrame frame = null;
     
-    public Campo(Pedina[][] board, PrintWriter out) {
+    public Campo(Pedina[][] board, PrintWriter out, JFrame frame) {
         this.board = board;
         this.out = out;
+        this.frame = frame;
     }
 
     public void drawBoard() {
-        JFrame frame = new JFrame("Dama-"+this.myColor);
-
-        frame.setLayout(new GridLayout(MAX, MAX));
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.frame.getContentPane().removeAll();
+        this.frame.setLayout(new GridLayout(MAX, MAX));
 
         for (int i = 0; i < MAX; i++) {
             for (int j = 0; j < MAX; j++) {
@@ -127,15 +123,13 @@ public class Campo {
                         
                     }
                 });
-                
-
-                frame.add(cells[i][j]);
+                this.frame.add(cells[i][j]);
             }
         }
 
-        frame.pack();
+        this.frame.revalidate();
+        this.frame.repaint();
         frame.setResizable(false);
-        frame.setVisible(true);
     }
 
 
