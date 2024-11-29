@@ -114,9 +114,28 @@ public class Server {
                                 manageShowPossibleMoves(words,you,playerColor);
                             break;
                     }
-                }
+                    //Cerchiamo di capire se la partita è finita
+                    String[] gameEnd = game.checkFinishGame();
+                    String winner = gameEnd[1];
+                    if(gameEnd[0] == "true"){
+                        //Se è finita devo comunicare ai client l'esito
+                        //Ricordando che out = black; out1 = white
+                        String reason = gameEnd[2];
 
-                endGame = game.checkWin();
+                        if(winner == "white"){
+                            out.println("gameEnd#loser#"+reason);
+                            out1.println("gameEnd#winner#"+reason);
+                        }
+                        else{
+                            out.println("gameEnd#winner#" + reason);
+                            out1.println("gameEnd#loser#" + reason);
+                        }
+                        //Lascio il tempo ai client di ricevere il messaggio
+                        Thread.sleep(2000);
+                        endGame = true;
+
+                    }
+                }
             }
         }
         catch(Exception e){
@@ -199,13 +218,7 @@ public class Server {
         String msg1 = Node.convertTreeToString2(allPossibleMoves);
         System.out.println("MSG1:" + msg1);
 
-        System.out.println("Calcolo il msg2.....");
-
-        String msg2 = Node.convertTreeToString2(Node.convertStringToTree(Node.convertTreeToString(allPossibleMoves)));
-
-        System.out.println("MSG2:" + msg2);
-
-
+     
         //Se è una pedina nera, devo reversare le coordinate
         if(color.equals("black"))
             reverseCoordinates(allPossibleMoves,game);
@@ -213,6 +226,7 @@ public class Server {
         //Ora che ho le coordinate reversate, devo convertire il messaggio in stringa così che il client puo riceverlo
         String msg = Node.convertTreeToString(allPossibleMoves);
         
+        System.out.println(msg);
         if (msg.length() > 0) {
             out.println("showPossibleMoves#" + msg);
         }
@@ -226,8 +240,8 @@ public class Server {
             root.y = game.getMax() - 1 - root.y;
 
             if(root.pieceEaten != null){
-                root.pieceEaten.getPosizione().setX(game.getMax() - 1 - root.pieceEaten.getPosizione().getX());
-                root.pieceEaten.getPosizione().setY(game.getMax() - 1 - root.pieceEaten.getPosizione().getY());
+                root.pieceEaten.getPosizione().setX(game.getMax() - 1 - root.pieceEaten.getPosizione().getX() );
+                root.pieceEaten.getPosizione().setY(game.getMax() - 1 - root.pieceEaten.getPosizione().getY() );
             }
 
             reverseCoordinates(root.dl, game);

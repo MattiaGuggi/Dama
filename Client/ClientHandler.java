@@ -5,6 +5,7 @@ import java.io.*;
 import java.util.ArrayList;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 
 import Server.Node;
 import Server.Pedina;
@@ -18,6 +19,13 @@ public class ClientHandler extends Thread {
     private final int dim = MAX * MAX * 10;
     private Campo campo = null;
     private JFrame frame = null;
+    
+    private Socket socket;
+    BufferedReader in ;
+
+    PrintWriter out;
+
+
     private JButton button = new JButton("Search Game!") {
         @Override
         protected void paintComponent(Graphics g) {
@@ -50,17 +58,17 @@ public class ClientHandler extends Thread {
             InetAddress serverAddress = InetAddress.getByName("localhost");
             //Connessione al server
 
-            Socket socket = new Socket(serverAddress,50000);
+            socket = new Socket(serverAddress,50000);
             System.out.println("Sono connesso al server: " + serverAddress);
 
-            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-            PrintWriter out = new PrintWriter(socket.getOutputStream(),true);
+            out = new PrintWriter(socket.getOutputStream(),true);
             
             this.frame.getContentPane().setBackground(Color.decode("#121212"));
             this.frame.setSize(this.dim, this.dim);
             this.frame.setLayout(null);
-
+            this.frame.setTitle("Dama");
             this.button.setBackground(Color.CYAN);
             this.button.setForeground(Color.BLACK);
             this.button.setBounds((this.dim - 300) / 2, (this.dim - 75) / 2, 300, 75);
@@ -98,7 +106,6 @@ public class ClientHandler extends Thread {
             
             this.frame.setResizable(false);
             this.frame.setVisible(true);
-
             while(!partitaFinita){
                 String result = in.readLine();
 
@@ -115,30 +122,31 @@ public class ClientHandler extends Thread {
                         case "showPossibleMoves":
                             if (words.length > 0)
                                 this.handlePossibleMoves(words[1]);
-                            else
-                                System.out.println("Non ci sono mosse possibili");
 
                             break;
                         case "updateBoard":
                             if (words.length > 0)
                                 this.handleUpdateBoard(words);
                             break;
-                        case "mangiata":
-                            break;
-                        case "isDama":
-                            break;
-                        case "win":
+                        case "gameEnd":
+                            this.handleGameEnd(words);
                             break;
                     }
                 }
             }
-            
+            //Partita finita!
             socket.close();
-            
+            in.close();
+            out.close();
+
+            //Chiudo la finestra
+            frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+
         }
         catch(Exception e){
             e.printStackTrace();
         }
+
     }
 
     public void createGame (String result, PrintWriter out) {
@@ -170,6 +178,9 @@ public class ClientHandler extends Thread {
         // Crea un campo grafico basato sul campo su lato server
         this.campo = new Campo(board, out, this.frame);
         
+        //Modifico il titolo
+        this.frame.setTitle("Dama-" + messageSplitted[2]);
+
         //Settiamo il nostro colore
         System.out.println("Il tuo colore + "+messageSplitted[2]);
         this.campo.setColor(messageSplitted[2]);
@@ -225,5 +236,20 @@ public class ClientHandler extends Thread {
 
         campo.movePiece(path, false);
 
+    }
+
+    //Gestice la fine della partita
+    //winner|loser#reason
+    public void handleGameEnd(String[] words){
+        String state = words[1];
+        String reason = words[2];
+        partitaFinita = true;
+
+        if(state.equals("winner"))
+            JOptionPane.showMessageDialog(this.frame, "Hai vinto!!\n"+reason, "Fine della Partita (Vittoria)", JOptionPane.INFORMATION_MESSAGE);
+        else{
+            JOptionPane.showMessageDialog(this.frame, "Hai perso!!\n" + reason, "Fine della Partita (Sconfitta)",JOptionPane.WARNING_MESSAGE);
+        }
+        
     }
 }

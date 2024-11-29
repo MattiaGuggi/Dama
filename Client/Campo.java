@@ -22,6 +22,11 @@ public class Campo {
     private ArrayList<Square> squareList = new ArrayList<>(); // Lista con tutti i posti consigliati possibili
     private JFrame frame = null;
     
+    //Colori utilizzati -> ColorsDama
+
+    private Boolean blocked = false;    //Non farti cliccare mentre sta avvenendo un'animazione
+
+
     public Campo(Pedina[][] board, PrintWriter out, JFrame frame) {
         this.board = board;
         this.out = out;
@@ -39,10 +44,10 @@ public class Campo {
 
                 // Alterna i colori della scacchiera
                 if ((i + j) % 2 == 0) {
-                    cells[i][j].setBackground(Color.WHITE);
+                    cells[i][j].setBackground(ColorsDama.CASELLA_CHIARA);
                 }
                 else {
-                    cells[i][j].setBackground(Color.BLACK);
+                    cells[i][j].setBackground(ColorsDama.CASELLA_SCURA);
                 }
                 
                 // Se c'é una pedina
@@ -75,7 +80,7 @@ public class Campo {
                 
                     }
                     allPedineGrafiche.add(piece);
-                    piece.setColor(board[i][j].getColor().equals("black") ? Color.DARK_GRAY : Color.LIGHT_GRAY);
+                    piece.setColor(board[i][j].getColor().equals("black") ? ColorsDama.PEDINA_NERA : ColorsDama.PEDINA_BIANCA);
                     piece.setPreferredSize(new Dimension(60, 60));
                     cells[i][j].setLayout(new BorderLayout());
                     cells[i][j].add(piece, BorderLayout.CENTER);
@@ -170,6 +175,7 @@ public class Campo {
     //Muove un pezzo nel campo, seguendo un movimento
     public void movePiece(ArrayList<Node> pathChosen,Boolean callServer) {
 
+        this.blocked = true;
         // Comunica il movimento al server
         if (callServer)
             out.println("movePiece#" + pathChosen);
@@ -187,7 +193,7 @@ public class Campo {
         PedinaGrafica piece = getPedinaFromPosition(new Posizione(startPiece.x, startPiece.y));
         Boolean wasDama = piece.getIsDama();
         
-        String normalColor = piece.getColor().equals(Color.DARK_GRAY) ? "black" : "white";
+        String normalColor = piece.getColor().equals(ColorsDama.PEDINA_NERA) ? "black" : "white";
         
         // Rimuovi la pedina originale
         cells[startPiece.y][startPiece.x].remove(piece);
@@ -235,7 +241,8 @@ public class Campo {
                     public void mouseClicked(MouseEvent e) {
                         if (!isMyTurn())
                             return;
-                        
+
+                        removeSquares();
                         setPedinaCliccata(lastPiece);
                         System.out.println("Nuova pedina selezionata: " + lastPiece);
 
@@ -254,7 +261,7 @@ public class Campo {
             //Aggiungi la nuova pedina all'ArrayList
             
             
-            String color = piece.getColor().equals(Color.DARK_GRAY) ? "black" : "white";
+            String color = piece.getColor().equals(ColorsDama.PEDINA_NERA) ? "black" : "white";
             // Aggiorna logicamente la scacchiera
             this.board[startPiece.y][startPiece.x] = null;
             this.board[lastPiece.getPosition().getY()][lastPiece.getPosition().getX()] = new Pedina(lastPiece
@@ -282,6 +289,8 @@ public class Campo {
         // Deseleziona la pedina cliccata
         setPedinaCliccata(null);
 
+        this.blocked = false;
+
     }
 
 
@@ -307,15 +316,16 @@ public class Campo {
         PedinaGrafica newPiece = new PedinaGrafica(new Posizione(x, y),dama);
 
         allPedineGrafiche.add(newPiece);
-        newPiece.setColor(normalColor.equals("black") ? Color.DARK_GRAY : Color.LIGHT_GRAY);
+        newPiece.setColor(normalColor.equals("black") ? ColorsDama.PEDINA_NERA : ColorsDama.PEDINA_BIANCA);
         newPiece.setOpacity(1.0f);
 
         // Aggiungi la nuova pedina alla cella di destinazione
-        cells[y][x].setLayout(new BorderLayout());
-        cells[y][x].add(newPiece, BorderLayout.CENTER);
-        cells[y][x].revalidate();
-        cells[y][x].repaint();
-
+        SwingUtilities.invokeLater(()->{
+            cells[y][x].setLayout(new BorderLayout());
+            cells[y][x].add(newPiece, BorderLayout.CENTER);
+            cells[y][x].revalidate();
+            cells[y][x].repaint();
+        });
         return newPiece;
     }
 
@@ -325,11 +335,12 @@ public class Campo {
         Square div = new Square(x, y);
 
         squareList.add(div);
-
-        cells[y][x].setLayout(new BorderLayout());
-        cells[y][x].add(div, BorderLayout.CENTER);
-        cells[y][x].revalidate();
-        cells[y][x].repaint(); 
+        SwingUtilities.invokeLater(()->{
+            cells[y][x].setLayout(new BorderLayout());
+            cells[y][x].add(div, BorderLayout.CENTER);
+            cells[y][x].revalidate();
+            cells[y][x].repaint(); 
+        });
     }
 
     public void removeSquares(){
@@ -344,9 +355,11 @@ public class Campo {
         System.out.println("Pedina mangiata, " + piece);
         allPedineGrafiche.remove(piece); // Aggiorno ArrayList {
         board[piece.getPosition().getY()][piece.getPosition().getX()] = null; // Aggiorno board
-        cells[piece.getPosition().getY()][piece.getPosition().getX()].remove(piece);
-        cells[piece.getPosition().getY()][piece.getPosition().getX()].revalidate();
-        cells[piece.getPosition().getY()][piece.getPosition().getX()].repaint();
+        SwingUtilities.invokeLater(()->{
+            cells[piece.getPosition().getY()][piece.getPosition().getX()].remove(piece);
+            cells[piece.getPosition().getY()][piece.getPosition().getX()].revalidate();
+            cells[piece.getPosition().getY()][piece.getPosition().getX()].repaint();
+        });
         System.out.println("Pedina eliminata!!!");
     }
     
@@ -355,6 +368,8 @@ public class Campo {
     }
 
     public Boolean isMyTurn(){
+        if(this.blocked)
+            return false;
         if(this.turn == 0 && this.myColor.equals("black"))
             return true;
         if(this.turn == 1 && this.myColor.equals("white"))

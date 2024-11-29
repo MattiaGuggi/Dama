@@ -30,6 +30,7 @@ public class Posizione {
     }
     //Potrebbe essere necessario reversare le coordinate
     public String getString(Boolean reverse){
+        System.out.println("Reversa POSIZONEEEEEEEEEEEE");
         if(reverse)
             return (MAX - x - 1) + "-" + (MAX - y - 1);
         return x + "-" + y;

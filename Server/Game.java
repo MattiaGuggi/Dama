@@ -1,5 +1,7 @@
 package Server;
 
+import java.util.ArrayList;
+
 public class Game {
     private final int MAX = 8;
  
@@ -22,10 +24,10 @@ public class Game {
             {2,0,2,0,0,0,2,0},
             {0,2,0,2,0,2,0,2},
             {0,0,0,0,0,0,0,0},
+            {0,0,0,2,0,0,0,0},
             {0,0,0,0,0,0,0,0},
-            {1,0,1,0,1,0,1,0},
-            {0,1,0,1,0,1,0,1},
-            {1,0,1,0,1,0,1,0},
+            {0,0,0,0,0,0,0,0},
+            {0,0,0,0,0,0,1,0},
         };
         for(int i = 0;i<MAX;++i){
             for(int j = 0;j<MAX;++j){
@@ -69,12 +71,36 @@ public class Game {
         return boardData;
     }
 
-    public Boolean checkWin() {
-        // Devono esserci solo pedine di un colore
+    //Metodo che controlla se la partita è finita
+    //Ci sono 2 casi per cui una partita puo finire
+    //1) Finisci i pezzi
+    //2) I tuoi pezzi non hanno più mosse disponibili
+    public String[] checkFinishGame() {
+        //Prima controllo se ci sono ancora pezzi di colore diverso nella board
+        String[] result1 = checkWinForPieces();
+        //Se hai vinto per questo, evito di andare avanti e ritorno il risultato
+        if(result1[0].equals("true")){
+            return result1;
+        }
+
+        //Ora devo controllare se i pezzi rimasti possono ancora muoversi
+
+        String[] result2 = checkWinForMoves();
+        if(result2[0].equals("true")){
+            return result2;
+        }
+
+        //Se non entro in niente prima, vuol dire che nessuno ha vinto
+        return new String[] {"false",""};
+    }
+
+    //Controlla se la partita è finita perché l'avversario non hai più pezzi in vita
+    public String[] checkWinForPieces(){
+
         String color = "";
-        
-        for (int i=0 ; i<MAX ; i++) {
-            for (int j=0 ; j<MAX ; j++) {
+
+        for (int i = 0; i < MAX; i++) {
+            for (int j = 0; j < MAX; j++) {
                 // Se su quella cella c'é una pedina
                 if (board[i][j] != null) {
                     // Se il colore non e' gia' stato impostato
@@ -83,14 +109,59 @@ public class Game {
                     }
                     // N esima pedina incontrata, é diversa dalla prima incontrata?
                     else if (!color.equals(board[i][j].getColor())) {
-                        return false; // L'altro giocatore puó ancora muovere
+                        return new String[] {"false",""}; // L'altro giocatore puó ancora muovere
                     }
                 }
             }
         }
 
-        // Non ho incontrato problemi (nessuna pedina di colore diverso)
-        return true;
+        //Vuol dire che ho trovato solo pedine dello stesso colore (Quindi questo colore ha vinto)
+
+
+        return new String[] { "false", color,"Non ci sono più pedine disponibili nel campo!"};
+    }
+
+
+    //Controlla se i pezzi hanno ancora mosse disponili
+    public String[] checkWinForMoves(){
+
+        Boolean canWhiteMove = findMovesFromColor("white");
+
+        //Se il bianco non si puo muovere, vuol dire che ha vinto il black
+        if(!canWhiteMove){
+            return new String[] {"true","black","Non ci sono più mosse disponibili!"};
+        }
+
+        Boolean canBlackMove = findMovesFromColor("black");
+
+        if (!canBlackMove) {
+            return new String[] { "true", "white", "Non ci sono più mosse disponibili!" };
+        }
+
+        //S
+        return new String[] { "false", "" };
+
+    }
+
+
+    public Boolean findMovesFromColor(String color){
+        for(int i = 0;i<MAX;++i){
+            for(int j = 0;j<MAX;++j){
+
+                if(board[i][j] != null && board[i][j].getColor() == color){
+                    //Ora controlliamo le mosse che puo fare questa pedina
+
+                    Node moves = board[i][j].getPossibleMoves(board);
+
+                    //Se trovo anche solo una mossa che puo fare significa che il bianco si puo muovere
+                    if(moves.dl != null || moves.dr != null || moves.ul != null || moves.ur != null){
+                        return true;
+                    }
+                }
+
+            }
+        }
+        return false;
     }
 
 

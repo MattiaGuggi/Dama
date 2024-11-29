@@ -54,8 +54,15 @@ class PedinaGrafica extends JComponent {
         g.setColor(color);
         g.fillOval(10, 10, getWidth() - 20, getHeight() - 20);
         if(this.isDama){
-            g.setColor(Color.GREEN);
-            g.fillOval(20, 20, getWidth() - 40, getHeight() - 40);
+            if(this.getColor().equals(ColorsDama.PEDINA_NERA)){
+                g.setColor(ColorsDama.RE_NERO);
+            }
+            else
+                g.setColor(ColorsDama.RE_BIANCO);
+
+            g.fillOval(25, 25, getWidth()-50, getWidth()-50);
+
+
         }
     }
 

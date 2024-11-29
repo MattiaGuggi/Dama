@@ -16,7 +16,7 @@ public class Node{
     public Node dr;
     public Node dl;
 
-    public Pedina pieceEaten;
+    public Pedina pieceEaten = null;
     public Node(int x,int y,Pedina pieceEaten){
         this.x = x;
         this.y = y;
@@ -24,8 +24,10 @@ public class Node{
         this.ur = null;
         this.dl = null;
         this.dr = null;
-        
-        this.pieceEaten = pieceEaten;
+        if(pieceEaten != null)
+        this.pieceEaten = new Pedina(pieceEaten.getPosizione().getX(), pieceEaten.getPosizione().getY(),pieceEaten.getColor());
+
+
     }
 
     static public String convertTreeToString2(Node node) {

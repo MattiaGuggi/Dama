@@ -6,7 +6,7 @@ import java.awt.*;
 public class Square extends JComponent{
     private int x;
     private int y;
-    private Color color = Color.RED;
+    private Color color = ColorsDama.MOVIMENTO_DISPONIBILE;
 
     public Square(int x,int y){
         this.x = x;
