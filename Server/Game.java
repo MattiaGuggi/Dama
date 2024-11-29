@@ -1,7 +1,5 @@
 package Server;
 
-import java.util.ArrayList;
-
 public class Game {
     private final int MAX = 8;
  
@@ -24,19 +22,17 @@ public class Game {
             {2,0,2,0,0,0,2,0},
             {0,2,0,2,0,2,0,2},
             {0,0,0,0,0,0,0,0},
-            {0,0,0,2,0,0,0,0},
             {0,0,0,0,0,0,0,0},
-            {0,0,0,0,0,0,0,0},
-            {0,0,0,0,0,0,1,0},
+            {1,0,1,0,1,0,1,0},
+            {0,1,0,1,0,1,0,1},
+            {1,0,1,0,1,0,1,0},
         };
         for(int i = 0;i<MAX;++i){
             for(int j = 0;j<MAX;++j){
-                if(sampleBoard[i][j] == 1){
+                if(sampleBoard[i][j] == 1)
                     board[i][j] = new Pedina(j, i,"white");
-                }
-                else if(sampleBoard[i][j] == 2){
+                else if(sampleBoard[i][j] == 2)
                     board[i][j] = new Pedina(j, i,"black");
-                }
                 else{
                     board[i][j] = null;
                 }
@@ -122,7 +118,7 @@ public class Game {
     }
 
 
-    //Controlla se i pezzi hanno ancora mosse disponili
+    // Controlla se i pezzi hanno ancora mosse disponili
     public String[] checkWinForMoves(){
 
         Boolean canWhiteMove = findMovesFromColor("white");
