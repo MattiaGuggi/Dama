@@ -5,18 +5,40 @@ import java.io.*;
 import java.util.ArrayList;
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
+
 import Server.Node;
 import Server.Pedina;
+import java.awt.*;
+import java.awt.event.*;
 
 
 public class ClientHandler extends Thread {
     private Boolean partitaFinita = false;
     private final int MAX = 8;
+    private final int dim = MAX * MAX * 10;
     private Campo campo = null;
     private JFrame frame = null;
-    private JButton button = new JButton("Search Game!");
+    private JButton button = new JButton("Search Game!") {
+        @Override
+        protected void paintComponent(Graphics g) {
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        
+            // Background
+            g2.setColor(getBackground());
+            g2.fillRoundRect(0, 0, getWidth(), getHeight(), 30, 30);
+        
+            // Draw text
+            g2.setColor(getForeground());
+            FontMetrics fm = g2.getFontMetrics();
+            int stringWidth = fm.stringWidth(getText());
+            int stringHeight = fm.getAscent();
+            g2.drawString(getText(), (getWidth() - stringWidth) / 2, (getHeight() + stringHeight) / 2 - 2);
+        
+            g2.dispose();
+        }
+        
+    };
 
     public ClientHandler(JFrame frame) {
         this.frame = frame;
@@ -29,18 +51,42 @@ public class ClientHandler extends Thread {
             //Connessione al server
 
             Socket socket = new Socket(serverAddress,50000);
-            System.out.println("Sono connesso al server: "+serverAddress);
+            System.out.println("Sono connesso al server: " + serverAddress);
 
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
             PrintWriter out = new PrintWriter(socket.getOutputStream(),true);
             
-            this.frame.setSize(640, 640);
+            this.frame.getContentPane().setBackground(Color.decode("#121212"));
+            this.frame.setSize(this.dim, this.dim);
             this.frame.setLayout(null);
 
-            this.button.setBounds((640 - 300) / 2, (640 - 75) / 2, 300, 75);
+            this.button.setBackground(Color.CYAN);
+            this.button.setForeground(Color.BLACK);
+            this.button.setBounds((this.dim - 300) / 2, (this.dim - 75) / 2, 300, 75);
+            this.button.setBorder(null);
+
             this.frame.add(this.button);
 
+            // Stili
+            this.button.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseEntered(MouseEvent e) {
+                    button.setOpaque(true);
+                    button.setBackground(new Color(0, 0, 0, 175)); // Set translucent black background (alpha = 50/255)
+                    button.setForeground(Color.WHITE);
+                    button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                }
+
+                @Override
+                public void mouseExited(MouseEvent e) {
+                    button.setBackground(new Color(0, 255, 255, 255)); // Restore original opaque cyan color
+                    button.setForeground(Color.BLACK);
+                    button.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+                }
+            });
+
+            // Manda messaggio al server
             this.button.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -180,6 +226,4 @@ public class ClientHandler extends Thread {
         campo.movePiece(path, false);
 
     }
-
-    
 }
