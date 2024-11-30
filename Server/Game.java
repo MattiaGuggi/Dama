@@ -13,7 +13,6 @@ public class Game {
     public Game(){
         //Come prima cosa, creo il campo
         this.createBoard();
-        
     }
 
     private void createBoard(){
@@ -29,10 +28,12 @@ public class Game {
         };
         for(int i = 0;i<MAX;++i){
             for(int j = 0;j<MAX;++j){
-                if(sampleBoard[i][j] == 1)
+                if(sampleBoard[i][j] == 1){
                     board[i][j] = new Pedina(j, i,"white");
-                else if(sampleBoard[i][j] == 2)
+                }
+                else if(sampleBoard[i][j] == 2){
                     board[i][j] = new Pedina(j, i,"black");
+                }
                 else{
                     board[i][j] = null;
                 }
@@ -45,9 +46,8 @@ public class Game {
     }
 
     //Ritorna il campo in versione stringa
-    //Reverse indica se devo invertire il campo
+    // Reverse indica se devo invertire il campo (il black ce l'ha opposta)
     public String stringifyBoard(Boolean reverse){
-        
         // Conversione array in stringa di formato colore#x#y
         String boardData = "";
         for (int i = 0; i < MAX; i++) {
@@ -80,7 +80,6 @@ public class Game {
         }
 
         //Ora devo controllare se i pezzi rimasti possono ancora muoversi
-
         String[] result2 = checkWinForMoves();
         if(result2[0].equals("true")){
             return result2;
@@ -92,7 +91,6 @@ public class Game {
 
     //Controlla se la partita è finita perché l'avversario non hai più pezzi in vita
     public String[] checkWinForPieces(){
-
         String color = "";
 
         for (int i = 0; i < MAX; i++) {
@@ -112,15 +110,12 @@ public class Game {
         }
 
         //Vuol dire che ho trovato solo pedine dello stesso colore (Quindi questo colore ha vinto)
-
-
-        return new String[] { "false", color,"Non ci sono più pedine disponibili nel campo!"};
+        return new String[] { "false", color, "Non ci sono più pedine disponibili nel campo!"};
     }
 
 
-    // Controlla se i pezzi hanno ancora mosse disponili
+    //Controlla se i pezzi hanno ancora mosse disponili
     public String[] checkWinForMoves(){
-
         Boolean canWhiteMove = findMovesFromColor("white");
 
         //Se il bianco non si puo muovere, vuol dire che ha vinto il black
@@ -134,11 +129,9 @@ public class Game {
             return new String[] { "true", "white", "Non ci sono più mosse disponibili!" };
         }
 
-        //S
         return new String[] { "false", "" };
 
     }
-
 
     public Boolean findMovesFromColor(String color){
         for(int i = 0;i<MAX;++i){
@@ -159,7 +152,6 @@ public class Game {
         }
         return false;
     }
-
 
     public void changeTurn() {
         this.turn = (turn + 1) % 2;

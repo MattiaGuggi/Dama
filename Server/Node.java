@@ -25,9 +25,7 @@ public class Node{
         this.dl = null;
         this.dr = null;
         if(pieceEaten != null)
-        this.pieceEaten = new Pedina(pieceEaten.getPosizione().getX(), pieceEaten.getPosizione().getY(),pieceEaten.getColor());
-
-
+            this.pieceEaten = new Pedina(pieceEaten.getPosizione().getX(), pieceEaten.getPosizione().getY(),pieceEaten.getColor());
     }
 
     static public String convertTreeToString2(Node node) {
@@ -59,12 +57,9 @@ public class Node{
         return sb.toString();
     }
     
- 
-
     //Ritorna una stringa che rappresenta un albero
     public static String convertTreeToString(Node root){
         //Come prima cosa rappresento l'albero come vettore
-
         ArrayList<Node> albero = new ArrayList<>();
         Node.convertTreeToArray(root, albero, 0);
 
@@ -75,11 +70,9 @@ public class Node{
     //Converte una stringa in albero
     public static Node convertStringToTree(String stringa){
         //Come prima cosa devo ricavare il vettore dalla stringa
-
         ArrayList<Node> root = Node.convertStringToArray(stringa, false, 8);
 
         //Ora che ho il vettore devo convertirlo in albero
-
         return Node.convertArrayToTree(root, 0);
     }
 
@@ -101,9 +94,6 @@ public class Node{
         convertTreeToArray(nodo.ul, albero, 4 * indice + 3); // up-left
         convertTreeToArray(nodo.ur, albero, 4 * indice + 4); // up-right
     }
-
-
-
     
     // Converti un vettore in albero
     private static Node convertArrayToTree(ArrayList<Node> albero, int indice) {
@@ -123,14 +113,6 @@ public class Node{
 
         return nodo;
     }
-
-
-    
-
-
-
-
-
 
     //Converte un arrayList in stringa
     public static ArrayList<Node> convertStringToArray(String stringa,Boolean reverse,int max){
@@ -175,7 +157,6 @@ public class Node{
         
         return path;
     }
-
 
     @Override
     public String toString(){

@@ -39,7 +39,6 @@ class PedinaGrafica extends JComponent {
         return this.posizione;
     }
 
-    // Va ridisegnata cosí si capisce
     public void setIsDama() {
         this.isDama = true;
     }
@@ -61,8 +60,6 @@ class PedinaGrafica extends JComponent {
                 g.setColor(ColorsDama.RE_BIANCO);
 
             g.fillOval(25, 25, getWidth()-50, getWidth()-50);
-
-
         }
     }
 

@@ -23,8 +23,7 @@ public class Campo {
     private JFrame frame = null;
     
     //Colori utilizzati -> ColorsDama
-
-    private Boolean blocked = false;    //Non farti cliccare mentre sta avvenendo un'animazione
+    private Boolean blocked = false; //Non farti cliccare mentre sta avvenendo un'animazione
 
 
     public Campo(Pedina[][] board, PrintWriter out, JFrame frame) {
@@ -41,14 +40,11 @@ public class Campo {
             for (int j = 0; j < MAX; j++) {
                 cells[i][j] = new JPanel();
 
-
                 // Alterna i colori della scacchiera
-                if ((i + j) % 2 == 0) {
+                if ((i + j) % 2 == 0)
                     cells[i][j].setBackground(ColorsDama.CASELLA_CHIARA);
-                }
-                else {
+                else
                     cells[i][j].setBackground(ColorsDama.CASELLA_SCURA);
-                }
                 
                 // Se c'é una pedina
                 if (board[i][j] != null) {
@@ -139,21 +135,20 @@ public class Campo {
 
 
     public void findAllPath(Node tree,int x,int y,ArrayList<Node> currentPath,ArrayList<ArrayList<Node>> allPath) {
-        //If tree is null
         if(tree == null) 
             return;
     
         // Crea una nuova copia del percorso corrente e aggiungi il nodo corrente
-
         ArrayList<Node> newPath = new ArrayList<>(currentPath);
         newPath.add(tree);
 
 
-        // Se il nodo corrente è il target, salva il percorso
+        //Se il nodo corrente è il target, salva il percorso
         if (tree.x == x && tree.y == y) {
             allPath.add(newPath);
-        } else {
-            // Esplora tutte le direzioni disponibili
+        }
+        else {
+            //Esplora tutte le direzioni disponibili
             findAllPath(tree.dl, x,y, newPath, allPath);
             findAllPath(tree.dr, x,y, newPath, allPath);
             findAllPath(tree.ul, x,y, newPath, allPath);
@@ -174,7 +169,6 @@ public class Campo {
 
     //Muove un pezzo nel campo, seguendo un movimento
     public void movePiece(ArrayList<Node> pathChosen,Boolean callServer) {
-
         this.blocked = true;
         // Comunica il movimento al server
         if (callServer)
@@ -184,12 +178,9 @@ public class Campo {
         this.removeSquares();
 
         //Il primo elemento nel mio vettore, è la pedina di partenza
-
         Node startPiece = pathChosen.get(0);
 
-
         //Ora devo ricavare la pedina grafica da muovere
-
         PedinaGrafica piece = getPedinaFromPosition(new Posizione(startPiece.x, startPiece.y));
         Boolean wasDama = piece.getIsDama();
         
@@ -211,12 +202,13 @@ public class Campo {
                 addPieceToBoard(nodo.x,nodo.y,piece.getColor(),normalColor, wasDama);
 
                 Thread.sleep(40);
+
                 //Dopo che lo aggiungo, rimuovo la pedina da mangiare
                 if(nodo.pieceEaten != null)
                     removePedina(getPedinaFromPosition(new Posizione(nodo.pieceEaten.getPosizione().getX(), nodo.pieceEaten.getPosizione().getY())));
+
                 Thread.sleep(500);
                 //Ora rimuovo la pedina che avevo aggiunto
-
                 removePedina(getPedinaFromPosition(new Posizione(nodo.x, nodo.y)));
 
             }
@@ -259,16 +251,11 @@ public class Campo {
                 });
             }
             //Aggiungi la nuova pedina all'ArrayList
-            
-            
             String color = piece.getColor().equals(ColorsDama.PEDINA_NERA) ? "black" : "white";
             // Aggiorna logicamente la scacchiera
             this.board[startPiece.y][startPiece.x] = null;
             this.board[lastPiece.getPosition().getY()][lastPiece.getPosition().getX()] = new Pedina(lastPiece
                     .getPosition().getX(), lastPiece.getPosition().getY(),color);
-        
-
-        
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -290,28 +277,23 @@ public class Campo {
         setPedinaCliccata(null);
 
         this.blocked = false;
-
     }
-
 
     //Aggiunge una pedina alla checkerboard
     private PedinaGrafica addPieceToBoard(int x,int y,Color color,String normalColor,Boolean wasDama){
-
         Boolean dama = false;
         // Devo capire se devo upgradare il pezzo
         if (normalColor.equals(this.myColor) ) {
             // Se a muoversi è stato un mio pezzo, viene upgradato quando raggiunge lo zero
             if (y == 0)
                 dama = true;
-
-        } else if (y == MAX - 1) {
+        }
+        else if (y == MAX - 1) {
             dama = true;
         }
 
         if(!dama)
             dama = wasDama;
-
-
 
         PedinaGrafica newPiece = new PedinaGrafica(new Posizione(x, y),dama);
 
@@ -328,7 +310,6 @@ public class Campo {
         });
         return newPiece;
     }
-
 
     //Mostra graficamente i posti in cui puoi muoverti
     public void showSquares(int x, int y){

@@ -189,7 +189,6 @@ public class ClientHandler extends Thread {
 
     //words (x#y#null) (ul: (x#y#null) ur: (x#y#null) .... )
     public void handlePossibleMoves(String words) {
-        
         Node tree = Node.convertStringToTree(words);
         //La testa del tree corrisponde alla pedina stessa e va quindi tolta
         campo.removeSquares();
@@ -233,7 +232,6 @@ public class ClientHandler extends Thread {
         ArrayList<Node> path = Node.convertStringToArray(stringa,true,MAX);
 
         //In path adesso ho il percorso con le coordianate da seguire dalla pedina
-
         campo.movePiece(path, false);
 
     }

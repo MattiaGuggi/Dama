@@ -38,41 +38,40 @@ public class Pedina {
 
     // Devo ritornare tutte le posizioni in cui puó andare la pedina cliccata
     public Node getPossibleMoves(Pedina[][] board) {
-        //First i have to understand where I can go, top or bottom
+        // Devo capire se andare in alto o in basso
         int direction = (this.color.equals("white")) ? 1 : 0;
-        //direction = 0 means that the piece must go DOWN
-        //direction = 1 means that the piece must go UP
+        // direction = 0 la pedina deve andare GIU
+        // direction = 1 la pedina deve andare SU
         
         Node tree = new Node(this.posizione.getX(),this.posizione.getY(),null);
-
         
-        //But it can eat multiple pieces
+        //Puó mangiare piú pedine
         this.checkForEats(board,direction,tree,"",0);
 
-        //If eating is possible, you are forced to eat
+        // Le mangiate hanno prioritá sulle mosse normali
         if(tree.ul == null && tree.ur == null && tree.dl == null && tree.dr == null)
-            //The piece can move just once, so I do not need a recursive function
+            // La pedina puó muovere solo una volta, quindi non serve ricorsione :)
             this.checkForMove(board,direction,tree);
         
         return tree;
     }    
     
     private void checkForMove(Pedina[][] board,int direction,Node tree){
-         //Check right
+         //Destra
          if(this.posizione.getX() < this.MAX - 1){
-            //Down
+            //Giu
             if((direction == 0 || this.isDama) && this.posizione.getY() < this.MAX - 1 && board[this.posizione.getY() + 1][this.posizione.getX() + 1] == null )
                 tree.dr = new Node(this.posizione.getX() + 1,this.posizione.getY() + 1,null);
-            //Up
+            //Su
             if((direction == 1 || this.isDama) && this.posizione.getY() > 0 && board[this.posizione.getY() - 1][this.posizione.getX() + 1] == null)
                 tree.ur = new Node(this.posizione.getX() + 1,this.posizione.getY() - 1,null);
         }
-        //Check left
+        //Sinistra
         if(this.posizione.getX() > 0){
-            //Down
+            //Giu
             if((direction == 0 || this.isDama) && this.posizione.getY() < this.MAX - 1 && board[this.posizione.getY() + 1][this.posizione.getX() - 1] == null)
                 tree.dl = new Node(this.posizione.getX() - 1,this.posizione.getY() + 1,null);
-            //Up
+            //Su
             if((direction == 1 || this.isDama) && this.posizione.getY() > 0 &&  board[this.posizione.getY() - 1][this.posizione.getX() - 1] == null )
                 tree.ul = new Node(this.posizione.getX() - 1,this.posizione.getY() - 1,null);
         }
@@ -80,19 +79,17 @@ public class Pedina {
 
 
     private void checkForEats(Pedina[][] board,int orientation,Node node,String lastDirection,int depth){
-        //Max depth = 3
+        // Si possono mangiare massimo 3 pedine
         if(depth == 3)
             return;
 
-        //If I am not a boss, I can't eat boss pieces
-        //Try to go down
+        //Se non sono dama, non posso mangiare una dama
+        //Prova ad andare in alto
         if((orientation == 0 || this.isDama) && node.y < this.MAX - 2){
-            //What I have to check:
-            //-I need a piece which color is different from mine
-            //-I need a empty square to go
+            //Da controllare:
+            //Colore diverso dal mio + casella libera
 
-            //Left:
-            
+            //Sinistra:
             if(node.x > 1 && board[node.y+1][node.x-1] != null && !(board[node.y+1][node.x-1].isDama && !this.isDama ) && board[node.y+1][node.x-1].color != this.color && board[node.y+2][node.x-2] == null){
                 if(lastDirection != "ur" ){
                     node.dl = new Node(node.x-2,node.y+2,board[node.y+1][node.x-1]);
@@ -100,24 +97,21 @@ public class Pedina {
                     this.checkForEats(board,orientation,node.dl,"dl",depth+1);
                 }
             }
-            //Right:
-
+            //Destra:
             if(node.x < MAX-2 && board[node.y+1][node.x+1] != null && !(board[node.y+1][node.x+1].isDama && !this.isDama ) && board[node.y+1][node.x+1].color != this.color && board[node.y+2][node.x+2] == null){
-
                 if(lastDirection != "ul" ){
                     node.dr = new Node(node.x+2,node.y+2,board[node.y+1][node.x+1]);
 
                     this.checkForEats(board,orientation,node.dr,"dr",depth+1);
                 }
             }
-            
         }
-        //Try to go up
+        //Prova ad andare in alto
         if((orientation == 1 || this.isDama) && node.y > 1){
-            //What i have to check:
-            //-I need a piece which color is different from mine
-            //-I need a empty square to go
-            //Left:
+            //Da controllare:
+            //Colore diverso dal mio + casella libera
+            
+            //Sinistra:
             if(node.x > 1 && board[node.y-1][node.x-1] != null && !(board[node.y-1][node.x-1].isDama && !this.isDama ) && board[node.y-1][node.x-1].color != this.color && board[node.y-2][node.x-2] == null){
                 if(lastDirection != "dr"  ){
                     node.ul = new Node(node.x-2,node.y-2,board[node.y-1][node.x-1]);
@@ -126,7 +120,7 @@ public class Pedina {
                 }
             }
 
-            //Right:
+            //Destra
             if(node.x < MAX-2 &&  board[node.y-1][node.x+1] != null && !(board[node.y-1][node.x+1].isDama && !this.isDama ) && board[node.y-1][node.x+1].color != this.color && board[node.y-2][node.x+2] == null){
                 if(lastDirection != "dl" ){
                     node.ur = new Node(node.x+2,node.y-2,board[node.y-1][node.x+1]);
@@ -134,7 +128,6 @@ public class Pedina {
                     this.checkForEats(board,orientation,node.ur,"ur",depth+1);
                 }
             }
-
         }
     }
 

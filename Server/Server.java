@@ -61,7 +61,7 @@ public class Server {
             String board1 = game.stringifyBoard(true);
             String board2 = game.stringifyBoard(false);Boolean player1Ready = false, player2Ready = false, endGame = false;
 
-            // Wait for both players to indicate readiness
+            // Aspetta che entrambi mandano request di giocare
             while (!player1Ready || !player2Ready) {
                 if (!player1Ready) {
                     String result = in.readLine();
@@ -87,7 +87,7 @@ public class Server {
             //Posso iniziare la partita
             while(!endGame){
                 PrintWriter you = out;
-                PrintWriter other =out1;
+                PrintWriter other = out1;
                 String result = ""; 
                 String playerColor = "black";
                 int turn = game.getTurn();
@@ -148,8 +148,6 @@ public class Server {
 
     //MessageFromClient conterrà la path che il pezzo ha seguito nel muoversi
     static public void manageMovePiece(String[] messageFromClient,PrintWriter you,PrintWriter other,int turn,String pColor){
-
-
         String msg = messageFromClient[1];
         System.out.println("Msg: "+msg);
         //Ricavo il percorso che la mia pedina deve seguire
@@ -207,13 +205,11 @@ public class Server {
 
     static public void manageShowPossibleMoves(String[] messageFromClient, PrintWriter out, String color){
         Posizione posizione = getPositionFromString(messageFromClient[1]);
-
         int y = posizione.getY();
         int x = posizione.getX();
 
         // Controllare se dobbiam ore
         Node allPossibleMoves = board[y][x].getPossibleMoves(board); // Cerchiamo mosse possibili
-
 
         String msg1 = Node.convertTreeToString2(allPossibleMoves);
         System.out.println("MSG1:" + msg1);
