@@ -77,7 +77,6 @@ public class Pedina {
         }
     }
 
-
     private void checkForEats(Pedina[][] board,int orientation,Node node,String lastDirection,int depth){
         // Si possono mangiare massimo 3 pedine
         if(depth == 3)
@@ -93,7 +92,7 @@ public class Pedina {
             if(node.x > 1 && board[node.y+1][node.x-1] != null && !(board[node.y+1][node.x-1].isDama && !this.isDama ) && board[node.y+1][node.x-1].color != this.color && board[node.y+2][node.x-2] == null){
                 if(lastDirection != "ur" ){
                     node.dl = new Node(node.x-2,node.y+2,board[node.y+1][node.x-1]);
-                    //Check if there are more possible moves
+                    //Controlla se ci sono piú mosse possibili
                     this.checkForEats(board,orientation,node.dl,"dl",depth+1);
                 }
             }
@@ -115,7 +114,7 @@ public class Pedina {
             if(node.x > 1 && board[node.y-1][node.x-1] != null && !(board[node.y-1][node.x-1].isDama && !this.isDama ) && board[node.y-1][node.x-1].color != this.color && board[node.y-2][node.x-2] == null){
                 if(lastDirection != "dr"  ){
                     node.ul = new Node(node.x-2,node.y-2,board[node.y-1][node.x-1]);
-                    //Check if there are more possible moves
+                    //Controlla se ci sono piú mosse possibili
                     this.checkForEats(board,orientation,node.ul,"ul",depth+1);
                 }
             }
@@ -130,7 +129,6 @@ public class Pedina {
             }
         }
     }
-
 
     @Override
     public String toString() {

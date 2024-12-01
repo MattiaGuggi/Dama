@@ -3,14 +3,11 @@ package Client;
 import java.net.*;
 import java.io.*;
 import java.util.ArrayList;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-
-import Server.Node;
-import Server.Pedina;
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import Server.Node;
+import Server.Pedina;
 
 
 public class ClientHandler extends Thread {
@@ -81,14 +78,14 @@ public class ClientHandler extends Thread {
                 @Override
                 public void mouseEntered(MouseEvent e) {
                     button.setOpaque(true);
-                    button.setBackground(new Color(0, 0, 0, 175)); // Set translucent black background (alpha = 50/255)
+                    button.setBackground(new Color(0, 0, 0, 175));
                     button.setForeground(Color.WHITE);
                     button.setCursor(new Cursor(Cursor.HAND_CURSOR));
                 }
 
                 @Override
                 public void mouseExited(MouseEvent e) {
-                    button.setBackground(new Color(0, 255, 255, 255)); // Restore original opaque cyan color
+                    button.setBackground(new Color(0, 255, 255, 255));
                     button.setForeground(Color.BLACK);
                     button.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
                 }
@@ -104,7 +101,7 @@ public class ClientHandler extends Thread {
                 }
             });
             
-            this.frame.setResizable(false);
+            this.frame.setResizable(true);
             this.frame.setVisible(true);
             while(!partitaFinita){
                 String result = in.readLine();
@@ -127,6 +124,9 @@ public class ClientHandler extends Thread {
                         case "updateBoard":
                             if (words.length > 0)
                                 this.handleUpdateBoard(words);
+                            break;
+                        case "patta":
+                            this.handlePatta(words);
                             break;
                         case "gameEnd":
                             this.handleGameEnd(words);
@@ -198,7 +198,6 @@ public class ClientHandler extends Thread {
         iterateTree(tree.ul);
         iterateTree(tree.ur);
 
-
         PedinaGrafica piece = this.campo.getPedinaCliccata();
         // Setto le nuove mosse possibili di una pedina
         if (tree.dl != null || tree.dr != null || tree.ul != null || tree.ur != null) {
@@ -245,9 +244,36 @@ public class ClientHandler extends Thread {
 
         if(state.equals("winner"))
             JOptionPane.showMessageDialog(this.frame, "Hai vinto!!\n"+reason, "Fine della Partita (Vittoria)", JOptionPane.INFORMATION_MESSAGE);
-        else{
+        else if (state.equals("loser"))
             JOptionPane.showMessageDialog(this.frame, "Hai perso!!\n" + reason, "Fine della Partita (Sconfitta)",JOptionPane.WARNING_MESSAGE);
-        }
+        else if (state.equals("patta"))
+            JOptionPane.showMessageDialog(this.frame, "Pareggio!!", "Fine della Partita (Pareggio)", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    public void handlePatta(String[] words) {
+        String reason = words[1];
+
+        if (reason.equals("request")) {
+            int response = JOptionPane.showConfirmDialog(
+                this.frame,
+                "L'avversario richiede una patta. Accettare?",
+                "Patta",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE
+            );
         
+            if (response == JOptionPane.YES_OPTION) {
+                System.out.println("Patta accettata.");
+                out.println("patta#accept");
+            }
+            else if (response == JOptionPane.NO_OPTION) {
+                System.out.println("Patta rifiutata.");
+                out.println("patta#denied");
+            }
+        }
+        else if (reason.equals("denied")) {
+            JOptionPane.showMessageDialog(this.frame, "Patta rifiutata!!\n" + reason, "Richiesta di patta (Rifiutata)",JOptionPane.WARNING_MESSAGE);
+            campo.resetButton();
+        }
     }
 }

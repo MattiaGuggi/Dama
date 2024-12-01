@@ -130,7 +130,6 @@ public class Game {
         }
 
         return new String[] { "false", "" };
-
     }
 
     public Boolean findMovesFromColor(String color){

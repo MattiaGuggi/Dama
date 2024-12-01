@@ -1,14 +1,14 @@
 package Client;
 
 import java.io.*;
-import javax.swing.*;
-import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import Server.Pedina;
 import Server.Posizione;
 import Server.Node;
+import java.awt.*;
+import javax.swing.*;
 
 public class Campo {
     private final int MAX = 8;
@@ -21,6 +21,8 @@ public class Campo {
     private int turn = 1;
     private ArrayList<Square> squareList = new ArrayList<>(); // Lista con tutti i posti consigliati possibili
     private JFrame frame = null;
+    private JButton patta = new JButton("Richiedi patta");
+    private JButton resa = new JButton("Arrenditi");
     
     //Colori utilizzati -> ColorsDama
     private Boolean blocked = false; //Non farti cliccare mentre sta avvenendo un'animazione
@@ -34,8 +36,71 @@ public class Campo {
 
     public void drawBoard() {
         this.frame.getContentPane().removeAll();
-        this.frame.setLayout(new GridLayout(MAX, MAX));
+        this.frame.getContentPane().setLayout(new BorderLayout());
+        
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        
+        JPanel buttonsPanel = new JPanel();
+        buttonsPanel.setLayout(new GridLayout(1, 2));
+    
+        this.patta.setBackground(Color.CYAN);
+        this.patta.setForeground(Color.BLACK);
+        this.patta.setPreferredSize(new Dimension(300, 75));
+        this.patta.setBorder(null);
+    
+        this.resa.setBackground(Color.CYAN);
+        this.resa.setForeground(Color.BLACK);
+        this.resa.setPreferredSize(new Dimension(300, 75));
+        this.resa.setBorder(null);
+    
+        buttonsPanel.add(this.patta);
+        buttonsPanel.add(this.resa);
+    
+        this.patta.addActionListener(e -> {
+            out.println("patta#request");
+            patta.setEnabled(false);
+            patta.setText("Request sent...");
+        });
+        this.resa.addActionListener(e -> {
+            out.println("resa#request");
+            resa.setEnabled(false);
+            resa.setText("");
+        });
+        this.resa.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                resa.setOpaque(true);
+                resa.setBackground(new Color(0, 0, 0, 175));
+                resa.setForeground(Color.WHITE);
+                resa.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            }
 
+            @Override
+            public void mouseExited(MouseEvent e) {
+                resa.setBackground(new Color(0, 255, 255, 255));
+                resa.setForeground(Color.BLACK);
+                resa.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+            }
+        });
+        this.patta.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                patta.setOpaque(true);
+                patta.setBackground(new Color(0, 0, 0, 175));
+                patta.setForeground(Color.WHITE);
+                patta.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                patta.setBackground(new Color(0, 255, 255, 255));
+                patta.setForeground(Color.BLACK);
+                patta.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+            }
+        });
+
+        JPanel boardPanel = new JPanel(new GridLayout(MAX, MAX));
+        boardPanel.setPreferredSize(new Dimension(480, 480));
         for (int i = 0; i < MAX; i++) {
             for (int j = 0; j < MAX; j++) {
                 cells[i][j] = new JPanel();
@@ -124,15 +189,21 @@ public class Campo {
                         
                     }
                 });
-                this.frame.add(cells[i][j]);
+                boardPanel.add(cells[i][j]);
             }
         }
 
+        mainPanel.add(boardPanel, BorderLayout.CENTER);
+        mainPanel.add(buttonsPanel, BorderLayout.SOUTH);
+    
+        this.frame.setPreferredSize(new Dimension(600, 700));
+        this.frame.add(mainPanel, BorderLayout.CENTER);
+        this.frame.pack();
         this.frame.revalidate();
         this.frame.repaint();
-        frame.setResizable(false);
+        this.frame.setResizable(false);
+        this.frame.setVisible(true);
     }
-
 
     public void findAllPath(Node tree,int x,int y,ArrayList<Node> currentPath,ArrayList<ArrayList<Node>> allPath) {
         if(tree == null) 
@@ -197,7 +268,6 @@ public class Campo {
             for(int i = 1;i<pathChosen.size()-1;++i){
                 System.out.println("Dentro il ciclo!!");
                 Node nodo = pathChosen.get(i);
-
 
                 addPieceToBoard(nodo.x,nodo.y,piece.getColor(),normalColor, wasDama);
 
@@ -342,6 +412,12 @@ public class Campo {
             cells[piece.getPosition().getY()][piece.getPosition().getX()].repaint();
         });
         System.out.println("Pedina eliminata!!!");
+    }
+
+    public void resetButton()  {
+        this.patta.setText("Richiedi patta");
+        this.patta.setEnabled(true);
+        this.patta.setForeground(Color.BLACK);
     }
     
     public void changeTurn() {

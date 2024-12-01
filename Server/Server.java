@@ -113,16 +113,26 @@ public class Server {
                         case "showPossibleMoves":
                                 manageShowPossibleMoves(words,you,playerColor);
                             break;
+                        case "resa":
+                            manageResa(words,you,other,playerColor);
+                            endGame = true; // Finisco il gioco
+                            //Lascio il tempo ai client di ricevere il messaggio
+                            Thread.sleep(2000);
+                            break;
+                        case "patta":
+                            managePatta(words,you,other,playerColor);
+                            game.changeTurn(); // Cosi l'altro client puó rispondere (ho barato)
+                            break;
                     }
                     //Cerchiamo di capire se la partita è finita
                     String[] gameEnd = game.checkFinishGame();
                     String winner = gameEnd[1];
-                    if(gameEnd[0] == "true"){
+                    if(gameEnd[0].equals("true")){
                         //Se è finita devo comunicare ai client l'esito
                         //Ricordando che out = black; out1 = white
                         String reason = gameEnd[2];
 
-                        if(winner == "white"){
+                        if(winner.equals("white")){
                             out.println("gameEnd#loser#"+reason);
                             out1.println("gameEnd#winner#"+reason);
                         }
@@ -225,6 +235,35 @@ public class Server {
         System.out.println(msg);
         if (msg.length() > 0) {
             out.println("showPossibleMoves#" + msg);
+        }
+    }
+
+    static public void manageResa(String[] messageFromClient, PrintWriter you, PrintWriter other, String color) {
+        String pColor = messageFromClient[1];
+
+        // Se matchano i colori allora ha richiesto la resa e quindi perso
+        if(!pColor.equals(color)){
+            you.println("gameEnd#loser#Ti sei arreso");
+            other.println("gameEnd#winner#L' avversario si é arreso");
+        }
+        else{
+            you.println("gameEnd#winner#L' avversario si é arreso");
+            other.println("gameEnd#loser#Ti sei arreso");
+        }
+    }
+
+    static public void managePatta(String[] messageFromClient, PrintWriter you, PrintWriter other, String color) {
+        String reason = messageFromClient[1];
+
+        // Se un client vuole fare patta
+        if (reason.equals("request"))
+            other.println("patta#request");
+        else if (reason.equals("accept")){
+            you.println("gameEnd#patta#Pareggio!");
+            other.println("gameEnd#patta#Pareggio!");
+        }
+        else if (reason.equals("denied")) {
+            other.println("patta#denied");
         }
     }
     

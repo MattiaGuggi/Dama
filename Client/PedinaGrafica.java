@@ -71,7 +71,6 @@ class PedinaGrafica extends JComponent {
         return this.allPossibleMoves;
     }
 
-
     @Override
     public String toString() {
         return this.posizione.toString();

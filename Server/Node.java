@@ -89,10 +89,10 @@ public class Node{
             return; // Se il nodo è nullo, non proseguire
 
         // Inserisce ricorsivamente i figli nei loro indici calcolati
-        convertTreeToArray(nodo.dl, albero, 4 * indice + 1); // down-left
-        convertTreeToArray(nodo.dr, albero, 4 * indice + 2); // down-right
-        convertTreeToArray(nodo.ul, albero, 4 * indice + 3); // up-left
-        convertTreeToArray(nodo.ur, albero, 4 * indice + 4); // up-right
+        convertTreeToArray(nodo.dl, albero, 4 * indice + 1); // giu-sx
+        convertTreeToArray(nodo.dr, albero, 4 * indice + 2); // giu-dx
+        convertTreeToArray(nodo.ul, albero, 4 * indice + 3); // su-sx
+        convertTreeToArray(nodo.ur, albero, 4 * indice + 4); // su-dx
     }
     
     // Converti un vettore in albero
@@ -106,10 +106,10 @@ public class Node{
         Node nodo = albero.get(indice);
 
         // Ricorsivamente costruisci i figli
-        nodo.dl = convertArrayToTree(albero, 4 * indice + 1); // down-left
-        nodo.dr = convertArrayToTree(albero, 4 * indice + 2); // down-right
-        nodo.ul = convertArrayToTree(albero, 4 * indice + 3); // up-left
-        nodo.ur = convertArrayToTree(albero, 4 * indice + 4); // up-right
+        nodo.dl = convertArrayToTree(albero, 4 * indice + 1); // giu-sx
+        nodo.dr = convertArrayToTree(albero, 4 * indice + 2); // giu-dx
+        nodo.ul = convertArrayToTree(albero, 4 * indice + 3); // su-sx
+        nodo.ur = convertArrayToTree(albero, 4 * indice + 4); // su-dx
 
         return nodo;
     }
