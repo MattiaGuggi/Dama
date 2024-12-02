@@ -9,6 +9,7 @@ import Server.Posizione;
 import Server.Node;
 import java.awt.*;
 import javax.swing.*;
+import javax.swing.border.MatteBorder;
 
 public class Campo {
     private final int MAX = 8;
@@ -354,7 +355,7 @@ public class Campo {
 
     public void removePedina(PedinaGrafica piece) {
         System.out.println("Pedina mangiata, " + piece);
-        allPedineGrafiche.remove(piece); // Aggiorno ArrayList {
+        allPedineGrafiche.remove(piece); // Aggiorno ArrayList 
         board[piece.getPosition().getY()][piece.getPosition().getX()] = null; // Aggiorno board
         SwingUtilities.invokeLater(()->{
             cells[piece.getPosition().getY()][piece.getPosition().getX()].remove(piece);
@@ -373,25 +374,57 @@ public class Campo {
             else if (message.equals("resa"))
                 button.setText("");
         });
+
+
+
+        button.setBorderPainted(false);
+
+        button.setFocusPainted(false);
         button.setBackground(Color.CYAN);
         button.setForeground(Color.BLACK);
         button.setPreferredSize(new Dimension(300, 75));
+
+        //button.setBorder(new MatteBorder(0, 2, 0, 0, Color.RED)); // Top, Left, Bottom, Right
+
+
         button.setBorder(null);
 
         button.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
-                button.setOpaque(true);
-                button.setBackground(new Color(0, 0, 0, 175));
-                button.setForeground(Color.WHITE);
-                button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                SwingUtilities.invokeLater(()->{
+                    button.setBorderPainted(false);
+
+                    button.setOpaque(true);
+                    button.setForeground(Color.WHITE);
+
+                    button.setBackground(Color.BLUE);
+                    //button.setBackground(new Color(0, 0, 0, 175));
+                    button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+                    button.repaint();
+                    button.revalidate();
+                });
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
-                button.setBackground(new Color(0, 255, 255, 255));
-                button.setForeground(Color.BLACK);
-                button.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+                SwingUtilities.invokeLater(()->{
+                    button.setBorderPainted(false);
+
+                    button.setOpaque(true);
+                    button.setForeground(Color.BLACK);
+
+                    button.setBackground(new Color(0, 255, 255, 255));
+                    button.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+
+
+
+
+
+                    button.repaint();
+                    button.revalidate();
+                });
             }
         });
     }

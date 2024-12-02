@@ -78,7 +78,10 @@ public class ClientHandler extends Thread {
                 @Override
                 public void mouseEntered(MouseEvent e) {
                     button.setOpaque(true);
-                    button.setBackground(new Color(0, 0, 0, 175));
+                    //button.setBackground(new Color(0, 0, 0, 175));
+
+                    button.setBackground(Color.BLUE);
+
                     button.setForeground(Color.WHITE);
                     button.setCursor(new Cursor(Cursor.HAND_CURSOR));
                 }
