@@ -66,6 +66,7 @@ public class ClientHandler extends Thread {
             this.frame.setSize(this.dim, this.dim);
             this.frame.setLayout(null);
             this.frame.setTitle("Dama");
+            this.frame.setResizable(false);
             this.button.setBackground(Color.CYAN);
             this.button.setForeground(Color.BLACK);
             this.button.setBounds((this.dim - 300) / 2, (this.dim - 75) / 2, 300, 75);
@@ -104,11 +105,43 @@ public class ClientHandler extends Thread {
                 }
             });
             
-            this.frame.setResizable(true);
+            //Aggiungo l'evento che gestisce la chiusura della finestra
+            frame.addWindowListener(new WindowAdapter() {
+                // Gestisco cosa accade quanto chiudo la finestra
+                public void windowClosing(WindowEvent e) {
+                    if(campo != null && !campo.isMyTurn()){
+                        return;
+                    }
+                    System.out.println("Partita finita!");
+                    try{
+                        if(campo != null)
+                            out.println("leaveGame#"+campo.getColor());
+                        else 
+                            out.println("leaveGame");
+
+                    }
+                    catch(Exception exce){
+                        exce.printStackTrace();
+                    }
+
+                    frame.dispose();
+                    System.exit(0);
+
+                }
+            });
+
+
             this.frame.setVisible(true);
             while(!partitaFinita){
-                String result = in.readLine();
-
+                
+                String result = null;
+                try{
+                    result = in.readLine();
+                }
+                catch(Exception e){
+                    System.out.println("Mi disconnetto");
+                    partitaFinita = true;
+                }
                 //Formato generale: NomeComando#Data1#Data2#Data3....
                 if (result != null) {
                     // Devo decodificare la stringa che ho appena ricevuto
@@ -137,6 +170,7 @@ public class ClientHandler extends Thread {
                     }
                 }
             }
+            System.out.println("Partita finita!");
             //Partita finita!
             socket.close();
             in.close();
@@ -251,26 +285,44 @@ public class ClientHandler extends Thread {
             JOptionPane.showMessageDialog(this.frame, "Hai perso!!\n" + reason, "Fine della Partita (Sconfitta)",JOptionPane.WARNING_MESSAGE);
         else if (state.equals("patta"))
             JOptionPane.showMessageDialog(this.frame, "Pareggio!!", "Fine della Partita (Pareggio)", JOptionPane.INFORMATION_MESSAGE);
+        System.exit(0);
     }
 
     public void handlePatta(String[] words) {
         String reason = words[1];
 
         if (reason.equals("request")) {
-            int response = JOptionPane.showConfirmDialog(
-                this.frame,
-                "L'avversario richiede una patta. Accettare?",
-                "Patta",
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.QUESTION_MESSAGE
-            );
-        
+
+            JOptionPane optionPane = new JOptionPane(
+                    "L'avversario richiede una patta. Accettare?",
+                    JOptionPane.QUESTION_MESSAGE,
+                    JOptionPane.YES_NO_OPTION);
+
+
+            JDialog dialog = optionPane.createDialog(frame, "Patta");
+
+            System.out.println(dialog);
+
+            dialog.setSize(350, 150); // Imposta la dimensione del dialogo
+
+
+            dialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE); // Impedisce la chiusura automatica
+            dialog.setVisible(true);
+
+            //Ora faccio in modo che se in 5 secondi non rispondi, mandi automaticamente no!
+
+
+            Integer response = (Integer)optionPane.getValue();
+
             if (response == JOptionPane.YES_OPTION) {
                 System.out.println("Patta accettata.");
                 out.println("patta#accept");
             }
             else if (response == JOptionPane.NO_OPTION) {
                 System.out.println("Patta rifiutata.");
+             
+
+
                 out.println("patta#denied");
             }
         }

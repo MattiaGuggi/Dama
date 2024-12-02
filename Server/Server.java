@@ -123,6 +123,18 @@ public class Server {
                             managePatta(words,you,other,playerColor);
                             game.changeTurn(); // Cosi l'altro client puó rispondere (ho barato)
                             break;
+                        case "leaveGame":
+                            //Chi ha perso
+                            String color = words[1];
+                            if (color.equals("white")) {
+                                out.println("gameEnd#winner#" + "L'avversario si è disconnesso!");
+                            } else {
+                                out1.println("gameEnd#winner#" + "L'avversario si è disconnesso!");
+                            }
+                            System.out.println(words);
+                            endGame = true;
+                            break;
+                        
                     }
                     //Cerchiamo di capire se la partita è finita
                     String[] gameEnd = game.checkFinishGame();
@@ -155,7 +167,7 @@ public class Server {
             System.out.println("Fine partita!!");
         }
     }
-
+  
     //MessageFromClient conterrà la path che il pezzo ha seguito nel muoversi
     static public void manageMovePiece(String[] messageFromClient,PrintWriter you,PrintWriter other,int turn,String pColor){
         String msg = messageFromClient[1];
@@ -266,7 +278,13 @@ public class Server {
             other.println("patta#denied");
         }
     }
-    
+   
+    static public void manageLeaveGame(String message){
+        
+    }
+
+
+
     static public void reverseCoordinates(Node root,Game game){
         
         if(root != null){

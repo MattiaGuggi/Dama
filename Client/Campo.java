@@ -9,7 +9,6 @@ import Server.Posizione;
 import Server.Node;
 import java.awt.*;
 import javax.swing.*;
-import javax.swing.border.MatteBorder;
 
 public class Campo {
     private final int MAX = 8;
@@ -367,7 +366,12 @@ public class Campo {
 
     public void setUpButtons(JButton button, String message) {
         button.addActionListener(e -> {
+            //Non puoi fare niente se non è il tuo turno
+            if(!isMyTurn())
+                return;
             out.println(message + "#request");
+            //Se invio un messaggio
+            blocked = true;
             button.setEnabled(false);
             if (message.equals("patta"))
                 button.setText("Request sent...");
@@ -392,6 +396,8 @@ public class Campo {
         button.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
+                if(!isMyTurn())
+                    return;
                 SwingUtilities.invokeLater(()->{
                     button.setBorderPainted(false);
 
@@ -409,6 +415,8 @@ public class Campo {
 
             @Override
             public void mouseExited(MouseEvent e) {
+                if (!isMyTurn())
+                    return;
                 SwingUtilities.invokeLater(()->{
                     button.setBorderPainted(false);
 
@@ -419,21 +427,32 @@ public class Campo {
                     button.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 
 
-
-
-
                     button.repaint();
                     button.revalidate();
+
+                    System.out.println("Sei uscito dal bottome?");
                 });
             }
         });
     }
 
+    public JButton getPattaButton(){
+        return this.patta;
+    }
     public void resetButton()  {
         this.patta.setText("Richiedi patta");
         this.patta.setEnabled(true);
+        
         this.patta.setForeground(Color.BLACK);
+        this.patta.setBackground(new Color(0, 255, 255, 255));
+        this.patta.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+        
+        this.patta.repaint();
+        this.patta.revalidate();
+        //Ora puoi muoverti liberamente
+        blocked = false;
     }
+
     
     public void changeTurn() {
         this.turn = (turn + 1) % 2;
