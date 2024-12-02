@@ -42,62 +42,12 @@ public class Campo {
         
         JPanel buttonsPanel = new JPanel();
         buttonsPanel.setLayout(new GridLayout(1, 2));
-    
-        this.patta.setBackground(Color.CYAN);
-        this.patta.setForeground(Color.BLACK);
-        this.patta.setPreferredSize(new Dimension(300, 75));
-        this.patta.setBorder(null);
-    
-        this.resa.setBackground(Color.CYAN);
-        this.resa.setForeground(Color.BLACK);
-        this.resa.setPreferredSize(new Dimension(300, 75));
-        this.resa.setBorder(null);
+
+        setUpButtons(patta, "patta");
+        setUpButtons(resa, "resa");
     
         buttonsPanel.add(this.patta);
         buttonsPanel.add(this.resa);
-    
-        this.patta.addActionListener(e -> {
-            out.println("patta#request");
-            patta.setEnabled(false);
-            patta.setText("Request sent...");
-        });
-        this.resa.addActionListener(e -> {
-            out.println("resa#request");
-            resa.setEnabled(false);
-            resa.setText("");
-        });
-        this.resa.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                resa.setOpaque(true);
-                resa.setBackground(new Color(0, 0, 0, 175));
-                resa.setForeground(Color.WHITE);
-                resa.setCursor(new Cursor(Cursor.HAND_CURSOR));
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-                resa.setBackground(new Color(0, 255, 255, 255));
-                resa.setForeground(Color.BLACK);
-                resa.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-            }
-        });
-        this.patta.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                patta.setOpaque(true);
-                patta.setBackground(new Color(0, 0, 0, 175));
-                patta.setForeground(Color.WHITE);
-                patta.setCursor(new Cursor(Cursor.HAND_CURSOR));
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-                patta.setBackground(new Color(0, 255, 255, 255));
-                patta.setForeground(Color.BLACK);
-                patta.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-            }
-        });
 
         JPanel boardPanel = new JPanel(new GridLayout(MAX, MAX));
         boardPanel.setPreferredSize(new Dimension(480, 480));
@@ -412,6 +362,38 @@ public class Campo {
             cells[piece.getPosition().getY()][piece.getPosition().getX()].repaint();
         });
         System.out.println("Pedina eliminata!!!");
+    }
+
+    public void setUpButtons(JButton button, String message) {
+        button.addActionListener(e -> {
+            out.println(message + "#request");
+            button.setEnabled(false);
+            if (message.equals("patta"))
+                button.setText("Request sent...");
+            else if (message.equals("resa"))
+                button.setText("");
+        });
+        button.setBackground(Color.CYAN);
+        button.setForeground(Color.BLACK);
+        button.setPreferredSize(new Dimension(300, 75));
+        button.setBorder(null);
+
+        button.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                button.setOpaque(true);
+                button.setBackground(new Color(0, 0, 0, 175));
+                button.setForeground(Color.WHITE);
+                button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                button.setBackground(new Color(0, 255, 255, 255));
+                button.setForeground(Color.BLACK);
+                button.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+            }
+        });
     }
 
     public void resetButton()  {
