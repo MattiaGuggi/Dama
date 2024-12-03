@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 /**
  * Rappresenta un nodo di un albero.
- * Uso l'albero per rappresentare i percorsi che una pedina puo fare.
+ * Uso l'albero per rappresentare i percorsi che una pedina può fare.
  */
 
 public class Node{
@@ -28,35 +28,6 @@ public class Node{
             this.pieceEaten = new Pedina(pieceEaten.getPosizione().getX(), pieceEaten.getPosizione().getY(),pieceEaten.getColor());
     }
 
-    static public String convertTreeToString2(Node node) {
-        if (node == null) {
-            return "";
-        }
-        // Creazione della rappresentazione della stringa
-        StringBuilder sb = new StringBuilder();
-        sb.append("(" + node.x + ":" + node.y + ":" + node.pieceEaten + ")"); // Formato: (x:y:pieceEaten)
-
-        // Aggiunta dei figli, se esistono
-        if (node.dl != null || node.dr != null || node.ul != null || node.ur != null) {
-            sb.append(" (");
-            if (node.dl != null) {
-                sb.append("dl: ").append(convertTreeToString2(node.dl)).append(" ");
-            }
-            if (node.dr != null) {
-                sb.append("dr: ").append(convertTreeToString2(node.dr)).append(" ");
-            }
-            if (node.ul != null) {
-                sb.append("ul: ").append(convertTreeToString2(node.ul)).append(" ");
-            }
-            if (node.ur != null) {
-                sb.append("ur: ").append(convertTreeToString2(node.ur)).append(" ");
-            }
-            sb.append(")");
-        }
-
-        return sb.toString();
-    }
-    
     //Ritorna una stringa che rappresenta un albero
     public static String convertTreeToString(Node root){
         //Come prima cosa rappresento l'albero come vettore
@@ -77,35 +48,34 @@ public class Node{
     }
 
     private static void convertTreeToArray(Node nodo, ArrayList<Node> albero, int indice) {
-        // Assicura che il vettore abbia almeno la lunghezza necessaria
+        //Se l'indice sborda dal vettore, aggiungo null
         while (albero.size() <= indice) {
-            albero.add(null); // Riempie eventuali posizioni vuote
+            albero.add(null); 
         }
 
-        // Inserisce il nodo corrente nell'indice specificato
+        //Inserisco il nodo corrente nell'indice specificato
         albero.set(indice, nodo);
 
         if (nodo == null)
-            return; // Se il nodo è nullo, non proseguire
+            return; 
 
-        // Inserisce ricorsivamente i figli nei loro indici calcolati
+        //Inserisco ricorsivamente i figli nei loro indici calcolati
         convertTreeToArray(nodo.dl, albero, 4 * indice + 1); // giu-sx
         convertTreeToArray(nodo.dr, albero, 4 * indice + 2); // giu-dx
         convertTreeToArray(nodo.ul, albero, 4 * indice + 3); // su-sx
         convertTreeToArray(nodo.ur, albero, 4 * indice + 4); // su-dx
     }
     
-    // Converti un vettore in albero
+    //Converti un vettore in albero
     private static Node convertArrayToTree(ArrayList<Node> albero, int indice) {
-        // Se l'indice è fuori dai limiti o il nodo all'indice è null, restituisci null
         if (indice >= albero.size() || albero.get(indice) == null) {
             return null;
         }
 
-        // Prendi il nodo corrente dall'ArrayList
+        //Prendi il nodo corrente dall'ArrayList
         Node nodo = albero.get(indice);
 
-        // Ricorsivamente costruisci i figli
+        //Ricorsivamente costruisci i figli
         nodo.dl = convertArrayToTree(albero, 4 * indice + 1); // giu-sx
         nodo.dr = convertArrayToTree(albero, 4 * indice + 2); // giu-dx
         nodo.ul = convertArrayToTree(albero, 4 * indice + 3); // su-sx

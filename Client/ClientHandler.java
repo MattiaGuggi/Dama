@@ -112,7 +112,6 @@ public class ClientHandler extends Thread {
                     if(campo != null && !campo.isMyTurn()){
                         return;
                     }
-                    System.out.println("Partita finita!");
                     try{
                         if(campo != null)
                             out.println("leaveGame#"+campo.getColor());
@@ -139,7 +138,6 @@ public class ClientHandler extends Thread {
                     result = in.readLine();
                 }
                 catch(Exception e){
-                    System.out.println("Mi disconnetto");
                     partitaFinita = true;
                 }
                 //Formato generale: NomeComando#Data1#Data2#Data3....
@@ -219,7 +217,6 @@ public class ClientHandler extends Thread {
         this.frame.setTitle("Dama-" + messageSplitted[2]);
 
         //Settiamo il nostro colore
-        System.out.println("Il tuo colore + "+messageSplitted[2]);
         this.campo.setColor(messageSplitted[2]);
         this.campo.drawBoard();
     }
@@ -261,7 +258,6 @@ public class ClientHandler extends Thread {
     //La virgola divide gli elementi del vettore
     //pieceEaten è nel formato: colorx-y 
     public void handleUpdateBoard(String[] words) {
-        System.out.println("Messaggio ricevuto: "+words[1]);
 
         String stringa = words[1];
 
@@ -301,7 +297,6 @@ public class ClientHandler extends Thread {
 
             JDialog dialog = optionPane.createDialog(frame, "Patta");
 
-            System.out.println(dialog);
 
             dialog.setSize(350, 150); // Imposta la dimensione del dialogo
 
@@ -315,14 +310,9 @@ public class ClientHandler extends Thread {
             Integer response = (Integer)optionPane.getValue();
 
             if (response == JOptionPane.YES_OPTION) {
-                System.out.println("Patta accettata.");
                 out.println("patta#accept");
             }
             else if (response == JOptionPane.NO_OPTION) {
-                System.out.println("Patta rifiutata.");
-             
-
-
                 out.println("patta#denied");
             }
         }

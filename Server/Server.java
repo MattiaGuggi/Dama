@@ -104,8 +104,7 @@ public class Server {
                 if(result != null){
                     String[] words = result.split("#");
 
-                    System.out.println("Words: " + Arrays.toString(words)+ "\nColor:"+playerColor);
-                    
+                    System.out.println("Words: "+result);
                     switch(words[0]) {
                         case "movePiece":
                                 manageMovePiece(words,you,other,turn,playerColor);
@@ -131,7 +130,6 @@ public class Server {
                             } else {
                                 out1.println("gameEnd#winner#" + "L'avversario si è disconnesso!");
                             }
-                            System.out.println(words);
                             endGame = true;
                             break;
                         
@@ -171,7 +169,6 @@ public class Server {
     //MessageFromClient conterrà la path che il pezzo ha seguito nel muoversi
     static public void manageMovePiece(String[] messageFromClient,PrintWriter you,PrintWriter other,int turn,String pColor){
         String msg = messageFromClient[1];
-        System.out.println("Msg: "+msg);
         //Ricavo il percorso che la mia pedina deve seguire
         ArrayList<Node> path = Node.convertStringToArray(msg,game.getTurn() == 0,game.getMax());
 
@@ -187,7 +184,6 @@ public class Server {
         //Controllo se la mia mossa ha causato mangiate
         for(int i = 1;i<path.size();i++){
             if(path.get(i).pieceEaten != null){
-                System.out.println("Pedina da eliminare!!::"+path.get(i).pieceEaten);
                 //Ricorda di reversare le coordinate
                 int x = path.get(i).pieceEaten.getPosizione().getX();
                 int y = path.get(i).pieceEaten.getPosizione().getY();
@@ -233,8 +229,6 @@ public class Server {
         // Controllare se dobbiam ore
         Node allPossibleMoves = board[y][x].getPossibleMoves(board); // Cerchiamo mosse possibili
 
-        String msg1 = Node.convertTreeToString2(allPossibleMoves);
-        System.out.println("MSG1:" + msg1);
 
      
         //Se è una pedina nera, devo reversare le coordinate
@@ -244,7 +238,6 @@ public class Server {
         //Ora che ho le coordinate reversate, devo convertire il messaggio in stringa così che il client puo riceverlo
         String msg = Node.convertTreeToString(allPossibleMoves);
         
-        System.out.println(msg);
         if (msg.length() > 0) {
             out.println("showPossibleMoves#" + msg);
         }
@@ -319,7 +312,6 @@ public class Server {
             // Per questo devo reversare
             x = game.getMax() - x - 1;
             y = game.getMax() - y - 1;
-            System.out.println("Coordinate reversate!");
         }
         return new Posizione(x, y);
     }

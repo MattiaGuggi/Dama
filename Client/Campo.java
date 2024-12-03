@@ -75,7 +75,6 @@ public class Campo {
                                     return;
                                 removeSquares();
                                 setPedinaCliccata(piece);
-                                System.out.println("Nuova pedina selezionata: " + piece);
 
                                 for (PedinaGrafica p : allPedineGrafiche) {
                                     p.setOpacity(1.0f);
@@ -216,7 +215,6 @@ public class Campo {
         //Ora faccio in modo di spostare il pezzo gradualmente 
         try{
             for(int i = 1;i<pathChosen.size()-1;++i){
-                System.out.println("Dentro il ciclo!!");
                 Node nodo = pathChosen.get(i);
 
                 addPieceToBoard(nodo.x,nodo.y,piece.getColor(),normalColor, wasDama);
@@ -232,17 +230,14 @@ public class Campo {
                 removePedina(getPedinaFromPosition(new Posizione(nodo.x, nodo.y)));
 
             }
-            System.out.println("Fine animazioni");
             //L'ultimo lo faccio fuori
             Node nodo = pathChosen.get(pathChosen.size() - 1);
 
             final PedinaGrafica lastPiece = addPieceToBoard(nodo.x, nodo.y, piece.getColor(),normalColor,wasDama);
 
-            System.out.println("lastPiece:"+lastPiece.getPosition().getX()+"--"+lastPiece.getPosition().getY());
             Thread.sleep(50);
             // Dopo che lo aggiungo, rimuovo la pedina da mangiare
             if (nodo.pieceEaten != null){
-                System.out.println("Devi mangiare: "+nodo.pieceEaten);
                 removePedina(getPedinaFromPosition( new Posizione(nodo.pieceEaten.getPosizione().getX(), nodo.pieceEaten.getPosizione().getY())));
             }
             
@@ -256,7 +251,6 @@ public class Campo {
 
                         removeSquares();
                         setPedinaCliccata(lastPiece);
-                        System.out.println("Nuova pedina selezionata: " + lastPiece);
 
                         for (PedinaGrafica p : allPedineGrafiche) {
                             p.setOpacity(1.0f);
@@ -353,7 +347,6 @@ public class Campo {
     }
 
     public void removePedina(PedinaGrafica piece) {
-        System.out.println("Pedina mangiata, " + piece);
         allPedineGrafiche.remove(piece); // Aggiorno ArrayList 
         board[piece.getPosition().getY()][piece.getPosition().getX()] = null; // Aggiorno board
         SwingUtilities.invokeLater(()->{
@@ -361,7 +354,6 @@ public class Campo {
             cells[piece.getPosition().getY()][piece.getPosition().getX()].revalidate();
             cells[piece.getPosition().getY()][piece.getPosition().getX()].repaint();
         });
-        System.out.println("Pedina eliminata!!!");
     }
 
     public void setUpButtons(JButton button, String message) {
