@@ -429,8 +429,6 @@ public class Campo {
 
                     button.repaint();
                     button.revalidate();
-
-                    System.out.println("Sei uscito dal bottome?");
                 });
             }
         });
